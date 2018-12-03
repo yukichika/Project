@@ -11,6 +11,7 @@ lxml 3.8.0
 langdetect 1.0.7
 extractcontent3 0.0.2
 distutils 1.18.3
+tqdm 4.28.1
 ```
 
 ## How to Use

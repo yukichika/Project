@@ -12,6 +12,7 @@ import json
 import codecs
 import configparser
 from distutils.util import strtobool
+from tqdm import tqdm
 
 import Mymodule
 from Crawler import suffix_generator
@@ -69,7 +70,7 @@ def main(root_dir,tasks):
         num_to_url_dict[int(root)] = url
 
     """外部リンク・内部リンクの選定"""
-    for json_file in json_files:
+    for json_file in tqdm(json_files):
         root,ext = os.path.splitext(json_file)
         with open(os.path.join(src_pages_dir,json_file),"r",encoding='UTF-8') as fj:
             json_data = json.load(fj)
@@ -90,7 +91,8 @@ def main(root_dir,tasks):
 
         with codecs.open(os.path.join(src_pages_dir,json_file),"w","utf8") as fo:
             json.dump(json_data,fo,indent=4,ensure_ascii=False)
-        print(str(root) + "finished")
+
+        # print(str(root) + "finished")
 
 if __name__=="__main__":
     """設定ファイルの読み込み"""

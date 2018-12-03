@@ -11,6 +11,7 @@ import codecs
 from langdetect import detect
 import configparser
 from distutils.util import strtobool
+from tqdm import tqdm
 
 from Crawler import suffix_generator
 import Mymodule
@@ -114,7 +115,7 @@ def from_collected_jsons(root_dir):
     json_files = os.listdir(src_pages_dir)
     Mymodule.sort_nicely(json_files)
 
-    for json_file in json_files:
+    for json_file in tqdm(json_files):
         root,ext = os.path.splitext(json_file)
         with open(os.path.join(src_pages_dir,json_file),"r",encoding='UTF-8') as fj:
             json_data = json.load(fj)
@@ -137,7 +138,7 @@ def from_collected_jsons(root_dir):
         with codecs.open(os.path.join(src_pages_dir,json_file),"w","utf8") as fo:
             json.dump(json_data,fo,indent=4,ensure_ascii=False)
 
-        print(str(root) + "finished")
+        # print(str(root) + "finished")
 
 """
 URLを指定してhtmlを取得し，コンテンツに関係のないタグをドロップする．
