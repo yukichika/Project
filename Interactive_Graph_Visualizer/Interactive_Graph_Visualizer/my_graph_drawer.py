@@ -72,14 +72,16 @@ def reserve_nodes(G,param,value):
 # 	return pos
 
 def pos_initializer(G,path):
+	"""pathが存在した場合"""
 	if os.path.exists(path):
 		with open(path) as fi:
-			pos=pickle.load(fi)
+			pos = pickle.load(fi)
 		return pos
 
-	pos=dict()
+	"""pathが存在しない場合"""
+	pos = dict()
 	for a, d in G.nodes(data=True):
-		pos[a]=np.random.rand(2)
+		pos[a] = np.random.rand(2)
 	with open(path,"w") as fo:
 		pickle.dump(pos,fo)
 	return pos

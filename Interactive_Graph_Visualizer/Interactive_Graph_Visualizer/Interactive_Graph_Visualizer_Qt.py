@@ -503,7 +503,7 @@ def main(args):
 							   "None"=>無色）
 	"""
 	params["draw_option"] = {
-		# "weight_type":[],
+		"weight_type":[],
 
 		# "weight_type":["ATTR","REPUL"],
 
@@ -511,9 +511,9 @@ def main(args):
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
-		"weight_type":["ATTR","REPUL","HITS"],
-		"weight_attr":{"type":"h_score","min":1,"max":3},
-		"size_attr":{"type":"h_score","min":1000,"max":5000},
+		# "weight_type":["ATTR","REPUL","HITS"],
+		# "weight_attr":{"type":"h_score","min":1,"max":3},
+		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
 		# "weight_type":["ATTR","REPUL","BHITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
@@ -527,7 +527,7 @@ def main(args):
 		"node_type":"COMP1",
 		"do_rescale":True,
 		"with_label":False,
-		"lamb":0.5,
+		"lamb":0.8,
 		"add_random_move":False,
 		"cmap":"jet",
 		"lumine":200,

@@ -15,7 +15,7 @@ from collections import Counter
 import sys
 sys.path.append("../../MyPythonModule")
 import mymodule
-sys.path.append("../networkx-master")
+sys.path.append("../../Interactive_Graph_Visualizer/networkx-master")
 
 """
 urlからドメイン部分を抽出して返す．
@@ -55,7 +55,7 @@ def main(params):
 	for node in G:
 		with open(os.path.join(src_pages_dir,str(node)+".json"),"r") as fj:
 			node_data = json.load(fj)
-		node_datas[node] = node_data
+		node_datas[node] = node_data#jsonファイル内の情報の辞書
 
 	for node in G:
 		node_data = node_datas[node]
@@ -74,8 +74,8 @@ def main(params):
 
 	with open(src_gpkl_path,"w") as fo:
 		pickle.dump(G,fo)
-	with open(os.path.join(nx_dir,src_gpkl_path.split(".")[0] + "_hits_hosts.txt"),"w") as fo:
-		print >> fo,"この時点で、ノードには代表トピックとその色とオーソリティ・ハブスコア、from_hosts、to_hostsをエッジには重みの情報を渡している。"
+	with open(os.path.join(nx_dir,src_gpkl_path.split(".")[0] + "_hosts.txt"),"w") as fo:
+		print >> fo,"この時点で、ノードには代表トピックとその色とfrom_hostsとto_hostsをエッジには重みの情報を渡している。"
 		print >> fo,"from_hostはリンクされているWebページのドメインとその件数、to_hostsはリンクしているWebページのドメインとその件数。"
 		print >> fo,"ノード数：" + str(len(G.node.keys())) + "（変化なし）"
 
@@ -113,13 +113,14 @@ def suffix_generator(target=None,is_largest=False):
 if __name__=="__main__":
 	params = {}
 	params["search_word"] = u"iPhone"
-	params["max_page"] = 10
-	params["root_dir"] = ur"/home/yukichika/ドキュメント/Data/Search_" + params["search_word"] + "_" + unicode(params["max_page"]) + "_add_childs_append"
+	params["max_page"] = 400
+	params["root_dir"] = ur"/home/yukichika/ドキュメント/Data/Search_" + params["search_word"] + "_" + unicode(params["max_page"]) + "_add_childs"
 
-	params["K"] = 10
-	params["target"] = "myexttext"
 	params["is_largest"] = True
+	params["target"] = "myexttext"
+	params["K"] = 10
 	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
+
 	params["comp_func_name"] = "comp4_2"
 	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
 	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"

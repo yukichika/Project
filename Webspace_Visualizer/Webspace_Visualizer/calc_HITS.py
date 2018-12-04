@@ -67,7 +67,7 @@ def calc_hits_from_redefined_G(search_word,src_pkl_name,exp_name,root_dir,use_to
 	with open(os.path.join(nx_dir,src_pkl_name),"w") as fo:
 		pickle.dump(G,fo)
 
-def main(search_word,src_pkl_name,exp_name,root_dir,weight_key="weight"):
+def main(search_word,src_pkl_name,exp_name,root_dir,weight_key="weight",use_bhits=False):
 	"""関連フォルダの存在確認"""
 	if not os.path.exists(root_dir):
 		print "root_dir",root_dir,"is not exist"
@@ -87,17 +87,27 @@ def main(search_word,src_pkl_name,exp_name,root_dir,weight_key="weight"):
 	with open(os.path.join(nx_dir,src_pkl_name),"r") as fi:
 		G = pickle.load(fi)
 
-	h_scores,a_scores = nx.hits(G,weight_key=weight_key)
+	if use_bhits is True:
+		h_scores,a_scores = nx.bhits(G,weight_key=weight_key)
+		with open(os.path.join(nx_dir,src_pkl_name.split(".")[0] + "_hosts_bhits.txt"),"w") as fo:
+			print >> fo,"この時点で、ノードには代表トピックとその色とfrom_hostsとto_hostsとオーソリティ・ハブスコア、エッジには重みの情報を渡している。"
+			print >> fo,"ノード数：" + str(len(G.node.keys())) + "（変化なし）"
+			print >> fo,"weight_key:" + weight_key
+			print >> fo,"use_bhits:" + str(use_bhits)
+	else:
+		h_scores,a_scores = nx.hits(G,weight_key=weight_key)
+		with open(os.path.join(nx_dir,src_pkl_name.split(".")[0] + "_hosts_hits.txt"),"w") as fo:
+			print >> fo,"この時点で、ノードには代表トピックとその色とfrom_hostsとto_hostsとオーソリティ・ハブスコア、エッジには重みの情報を渡している。"
+			print >> fo,"ノード数：" + str(len(G.node.keys())) + "（変化なし）"
+			print >> fo,"weight_key:" + weight_key
+			print >> fo,"use_bhits:" + str(use_bhits)
+
 	nx.set_node_attributes(G,"a_score",a_scores)
 	nx.set_node_attributes(G,"h_score",h_scores)
 
 	"""データ保存"""
 	with open(os.path.join(nx_dir,src_pkl_name),"w") as fo:
 		pickle.dump(G,fo)
-	with open(os.path.join(nx_dir,src_pkl_name.split(".")[0] + "_hits.txt"),"w") as fo:
-		print >> fo,"この時点で、ノードには代表トピックとその色とオーソリティ・ハブスコア、エッジには重みの情報を渡している。"
-		print >> fo,"ノード数：" + str(len(G.node.keys())) + "（変化なし）"
-		print >> fo,"weight_key:" + weight_key
 
 def suffix_generator(target=None,is_largest=False):
 	suffix = ""
@@ -110,8 +120,8 @@ def suffix_generator(target=None,is_largest=False):
 if __name__ == "__main__":
 	"""収集したリンク情報をnx形式に変換"""
 	search_word = "iPhone"
-	max_page = 10
-	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs_append"
+	max_page = 400
+	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs"
 
 	is_largest = True#リンクから構築したグラフのうち，最大サイズのモノのみを使う場合True
 	target = "myexttext"#対象とするwebページの抽出方法を指定
@@ -122,7 +132,8 @@ if __name__ == "__main__":
 	exp_name = "K" + unicode(K) + suffix_generator(target=target,is_largest=is_largest)
 	src_pkl_name = "G_with_params_" + comp_func_name + ".gpkl"
 	weight_key = "no_weight"
+	use_bhits = False
 
-	#main(search_word,src_pkl_name,exp_name,root_dir,weight_key=weight_key)
+	main(search_word,src_pkl_name,exp_name,root_dir,weight_key=weight_key,use_bhits=use_bhits)
 	#use_to_link="childs"
 	#calc_hits_from_redefined_G(search_word,src_pkl_name,exp_name,root_dir,use_to_link=use_to_link)

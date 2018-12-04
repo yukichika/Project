@@ -212,7 +212,7 @@ def suffix_generator(target=None,is_largest=False):
 
 if __name__=="__main__":
 	search_word = u"iPhone"
-	max_page = 10
+	max_page = 400
 	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs"
 
 	is_largest = True

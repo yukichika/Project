@@ -308,10 +308,11 @@ def fruchterman_reingold_layout(G, k=None,
 	# if all_node_weights is None:
 	# 	all_node_weights = np.array(1)
 
+	"""初期値の設定"""
 	if pos is not None:
 		# Determine size of existing domain to adjust initial positions
 		#dom_size = max(coord for coord in pos_tup for pos_tup in pos.values())
-		dom_size = np.array([coord for coord in [pos_tup for pos_tup in pos.values()]]).max(0)
+		dom_size = np.array([coord for coord in [pos_tup for pos_tup in pos.values()]]).max(0)#初期値の最大
 		shape = (len(G), dim)
 		pos_arr = np.random.random(shape) * dom_size + center
 		for i, n in enumerate(G):
@@ -337,7 +338,8 @@ def fruchterman_reingold_layout(G, k=None,
 		pos = _sparse_fruchterman_reingold(A, k, pos_arr, fixed,
 										   iterations, dim)
 	except:
-		A = nx.to_numpy_matrix(G, weight=weight)
+		A = nx.to_numpy_matrix(G, weight=weight)#隣接行列
+
 		hits_scores = None
 		if revised_hits_scores is not None:
 			hits_scores = np.array(revised_hits_scores.values())
@@ -349,9 +351,11 @@ def fruchterman_reingold_layout(G, k=None,
 
 		"""普通の力学モデルか改良版力学モデルかの分岐"""
 		if all_node_weights is None and "HITS" not in weight_type:
-			all_node_weights = np.array(1)
+			print("simple")
+			# all_node_weights = np.array(1)
 			pos = _fruchterman_reingold(A, k, pos_arr, fixed, iterations, dim)
 		else:
+			print("LDA or HITS")
 			pos = _fruchterman_reingold_revised(A, all_node_weights, k, pos_arr, fixed, iterations, dim,hits_scores=hits_scores,lamb=lamb,add_random_move=add_random_move)
 
 		# if all_node_weights is None and "HITS" not in weight_type:
@@ -401,7 +405,7 @@ def _fruchterman_reingold(A, k=None, pos=None, fixed=None,
 	# this is the largest step allowed in the dynamics.
 	# We need to calculate this in case our fixed positions force our domain
 	# to be much bigger than 1x1
-	t = max(max(pos.T[0]) - min(pos.T[0]), max(pos.T[1]) - min(pos.T[1]))*0.1
+	t = max(max(pos.T[0]) - min(pos.T[0]), max(pos.T[1]) - min(pos.T[1]))*0.1#初期値の最大と最小の差*0.1
 	# simple cooling scheme.
 	# linearly step down by dt on each iteration so last iteration is size dt.
 	dt = t/float(iterations+1)
@@ -415,17 +419,19 @@ def _fruchterman_reingold(A, k=None, pos=None, fixed=None,
 		for i in range(pos.shape[1]):
 			delta[:, :, i] = pos[:, i, None] - pos[:, i]#Noneは縦ベクトルにしているだけ
 		# distance between points
-		distance = np.sqrt((delta**2).sum(axis=-1))
+		distance = np.sqrt((delta**2).sum(axis=-1))#全ノード間との距離
 		# enforce minimum distance of 0.01
 		distance = np.where(distance < 0.01, 0.01, distance)
 		# displacement "force"
+		#
 		displacement = np.transpose(np.transpose(delta) *
 									(k * k / distance**2 - A * distance / k)
 									).sum(axis=1)
+
 		# update positions
 		length = np.sqrt((displacement**2).sum(axis=1))
 		length = np.where(length < 0.01, 0.1, length)
-		delta_pos = np.transpose(np.transpose(displacement) * t / length)
+		delta_pos = np.transpose(np.transpose(displacement) * t / length)#移動分
 		if fixed is not None:
 			# don't change positions of fixed nodes
 			delta_pos[fixed] = 0.0
@@ -473,6 +479,8 @@ def _fruchterman_reingold_revised(A,all_node_weights, k=None, pos=None, fixed=No
 		#for i in topn_ind:
 		#	hits_comp[i]=10
 		hits_comp=hits_scores
+		print(hits_comp)
+		print(hits_comp.shape)
 
 		return np.transpose(np.transpose(delta) *
 									(lamb*(k * k*hits_comp/ ((distance**2)*all_node_weights_) ) - (1-lamb)*A_ * distance / (k*hits_comp))
@@ -524,8 +532,9 @@ def _fruchterman_reingold_revised(A,all_node_weights, k=None, pos=None, fixed=No
 	# this is still O(V^2)
 	# could use multilevel methods to speed this up significantly
 	A_=A.copy()
-	A_[A_.nonzero()]+=(1-A_[A_.nonzero()].mean())#平均を1で調整.
+	A_[A_.nonzero()]+=(1-A_[A_.nonzero()].mean())#平均を1で調整. => 要素があるところの平均が１
 	all_node_weights_=all_node_weights+(1-all_node_weights.mean())#平均を1で調整
+
 	#all_node_weights_=2*(all_node_weights_-1)#平均より近いものを負の値(引力)にしてみた．でもよく考えると引力しか働かないノードが生まれるから駄目だな
 	for iteration in range(iterations):
 		# matrix of difference between points

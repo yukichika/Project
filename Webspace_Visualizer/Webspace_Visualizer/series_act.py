@@ -102,18 +102,16 @@ if __name__ == "__main__":
 	except:
 		pass
 
-
 	"""LDA結果を重みとしてnxグラフに反映"""
 	comp_func_name = inifile.get('nx','comp_func_name')
 	void_node_remove = strtobool(inifile.get('nx','void_node_remove'))
 	print("-----LDAの結果を重みとしてnxグラフに反映-----")
 	LDA_modify_for_graph.main(root_dir=root_dir,exp_name=exp_name,comp_func_name=comp_func_name,G_name=G_name,void_node_remove=void_node_remove,is_largest=is_largest)#is_largestはremoveする際に効く
 
-	"""HITSアルゴリズム計算"""
-	weight_key = inifile.get('hits','weight_key')
-	src_pkl_name = "G_with_params_" + comp_func_name + ".gpkl"
-	print("-----HITSアルゴリズム計算-----")
-	calc_HITS.main(search_word,src_pkl_name,exp_name,root_dir,weight_key=weight_key)
+	"""
+	arrange_G_data.py　=>　calc_HITS.py（ここまでが可視化前の処理）
+	可視化はInteractive_Graph_Visualizer_Qt.pyを用いる．
+	"""
 
 	"""
 	nxグラフを可視化
