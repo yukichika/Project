@@ -133,6 +133,9 @@ def main(root_dir,sel_largest=True,G_name="G",rem_selfloop=True,use_to_link="chi
 	if sel_largest == True:
 		with open(os.path.join(root_dir,"file_id_list.list"),"w") as fo:
 			pickle.dump(list(G.node.keys()),fo)
+		with open(os.path.join(root_dir,"file_id_list.txt"),"w") as fo:
+			print >> fo,"全ノード（Webページ）　=>　最も多くWebページを含むノード群を選択．"
+			print >> fo,"この時点でのノードidのリストを格納．"
 
 	"""
 	一旦グラフ形式にまとめてから保存

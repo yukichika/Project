@@ -187,7 +187,7 @@ def get_color_map_theta(G,pos,lda,comp_type="COMP1",lumine=255,cmap="lch"):
 			color_map[node_no] = html_color
 
 	elif cmap == "jet":
-		#c_map=cm.jet
+		# c_map = cm.jet
 		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
 		file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}#ファイル名とLDAでの文書番号(逆引き)．LDAの方に作っとけばよかった．．．
 		color_map = {}

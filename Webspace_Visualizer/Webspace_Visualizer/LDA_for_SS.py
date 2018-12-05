@@ -101,6 +101,11 @@ def make_chasens(root_dir,target="text",target_list=[],chasen_dir_name="chasen")
 
 	with open(os.path.join(root_dir,"file_id_dict.dict"),"w") as fo:
 		pickle.dump(file_id_dict,fo)
+	with open(os.path.join(root_dir,"file_id_dict.txt"),"w") as fo:
+		print >> fo,"LDAに用いるためのコーパス作成"
+		print >> fo,"キーがLDAの番号，要素がノードidの辞書を格納．"
+		print >> fo,"len(file_id_dict):" + str(len(file_id_dict))
+
 
 """perprexityの推移グラフ作成"""
 def perp_graph(perp_path,opt="perp"):
@@ -193,6 +198,10 @@ def main(root_dir,K,iteration,smartinit,no_below=5,no_above=0.5,no_less=1,alpha=
 	print >> ft,"alpha=", lda.alpha
 	print >> ft,"beta=" ,lda.beta
 	print >> ft,"time=" ,elapsed_time
+
+	print >> ft,"len(lda.docs)=" ,str(len(lda.docs)) + "(Mと同一)"
+	print >> ft,"len(lda.vocas)=" ,str(len(lda.vocas)) + "(Vと同一)"
+	print >> ft,"len(lda.theta())=" ,str(len(lda.theta())) + "(Mと同一)"
 	ft.close()
 
 	perp_graph(os.path.join(exp_dir,"_perp.txt"),"perp")

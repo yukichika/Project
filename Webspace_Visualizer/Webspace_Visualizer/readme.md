@@ -28,6 +28,12 @@ LDA_modify_for_graph.py
 LDAから，ノードの代表トピック・色とエッジ間の重みを取得しnetworkxに反映．  
 また，全ノード間の重み（距離）も計算して保存．
 
+
+arrange_G_data.py  
+bhitsを計算するために，リンク先・リンク元のドメインをGに反映.  
+
 calc_HITS.py  
-ノードのHITSスコアを計算して，neworkxに反映．
+ノードのHITSスコアを計算して，neworkxに反映．  
+
+実行手順としてはseries_act.py→arrange_G_data.py→calc_HITS.py
 

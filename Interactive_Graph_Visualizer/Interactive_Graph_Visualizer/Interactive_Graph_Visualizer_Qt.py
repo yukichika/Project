@@ -503,9 +503,9 @@ def main(args):
 							   "None"=>無色）
 	"""
 	params["draw_option"] = {
-		"weight_type":[],
+		# "weight_type":[],
 
-		# "weight_type":["ATTR","REPUL"],
+		"weight_type":["ATTR","REPUL"],
 
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
@@ -527,7 +527,7 @@ def main(args):
 		"node_type":"COMP1",
 		"do_rescale":True,
 		"with_label":False,
-		"lamb":0.8,
+		"lamb":0.5,
 		"add_random_move":False,
 		"cmap":"jet",
 		"lumine":200,

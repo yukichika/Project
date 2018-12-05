@@ -204,6 +204,7 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 			largest = max(nx.connected_component_subgraphs(G_),key=len)
 			rem_nodes = set(G_.node.keys()) - set(largest.node.keys())
 			G.remove_nodes_from(rem_nodes)
+
 			with open(os.path.join(root_dir,"file_id_list2.list"),"w") as fo:
 				pickle.dump(list(G.node.keys()),fo)
 
@@ -258,9 +259,11 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 		print >> fo,"LDAを実行した後，LDAの結果がないノードを削除し，最大ノード群を再選択"
 		print >> fo,"この時点で、ノードには代表トピックとその色、エッジには重みの情報を渡している。"
 		print >> fo,"old_node_number:" + str(old_node_num) + "（G_myexttext_largest.gpkl）"
+		print >> fo,"len(lda.theta()):" + str(len(lda.theta())) + "（ldaにかけた文書数）"
 		print >> fo,"new_node_number:" + str(new_node_num) + "（G_with_params_comp4_2.gpkl）"
 
 	print "旧ノード数：" + str(old_node_num)
+	print "len(lda.theta())：" + str(len(lda.theta()))
 	print "新ノード数：" + str(new_node_num)
 
 	"""weight（全ノード間の距離）のヒストグラム作成"""

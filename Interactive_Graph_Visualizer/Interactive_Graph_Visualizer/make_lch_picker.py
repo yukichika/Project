@@ -128,7 +128,7 @@ if __name__=="__main__":
 	fig=plt.figure()
 	ax = fig.add_subplot(111,axisbg='Azure') # add subplot background colour
 	#h_values= np.linspace(0.01, np.pi, 10)
-	h_values= np.random.rand(5000)*np.pi
+	# h_values= np.random.rand(5000)*np.pi
 	#draw_half(h_values)
 	draw_colorbar(ax,resolution=100,color_map="jet_r")
 	#draw_color_hist(h_values)

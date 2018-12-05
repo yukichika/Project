@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("../../MyPythonModule")
 from LDA_kai import LDA
+sys.path.append("../networkx-master")
 
 COLORLIST_R = [r"#EB6100",r"#F39800",r"#FCC800",r"#FFF100",r"#CFDB00",r"#8FC31F",r"#22AC38",r"#009944",r"#009B6B",r"#009E96",r"#00A0C1",r"#00A0E9",r"#0086D1",r"#0068B7",r"#00479D",r"#1D2088",r"#601986",r"#920783",r"#BE0081",r"#E4007F",r"#E5006A",r"#E5004F",r"#E60033"]
 COLORLIST = [c for c in COLORLIST_R[::2]]#色のステップ調整
@@ -118,8 +119,8 @@ def suffix_generator(target=None,is_largest=False):
 if __name__=="__main__":
 	params = {}
 	params["search_word"] = u"iPhone"
-	params["max_page"] = 10
-	params["root_dir"] = params["root_dir"] = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs_append"
+	params["max_page"] = 400
+	params["root_dir"] = params["root_dir"] = ur"/home/yukichika/ドキュメント/Data/Search_" + params["search_word"] + "_" + unicode(params["max_page"]) + "_add_childs"
 
 	params["is_largest"] = True
 	params["target"] = "myexttext"
@@ -129,6 +130,6 @@ if __name__=="__main__":
 	params["comp_func_name"] = "comp4_2"
 	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
 	params["src_pkl_name"] = "G_with_params_"+params["comp_func_name"]+".gpkl"
-	params["target_node"] = 2
+	params["target_node"] = 0
 
 	main(params)

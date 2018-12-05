@@ -76,7 +76,7 @@ def main(params):
 		pickle.dump(G,fo)
 	with open(os.path.join(nx_dir,src_gpkl_path.split(".")[0] + "_hosts.txt"),"w") as fo:
 		print >> fo,"この時点で、ノードには代表トピックとその色とfrom_hostsとto_hostsをエッジには重みの情報を渡している。"
-		print >> fo,"from_hostはリンクされているWebページのドメインとその件数、to_hostsはリンクしているWebページのドメインとその件数。"
+		print >> fo,"from_hostはリンクされているWebページのドメインとその件数の辞書、to_hostsはリンクしているWebページのドメインとその件数の辞書。"
 		print >> fo,"ノード数：" + str(len(G.node.keys())) + "（変化なし）"
 
 def del_keys(params):

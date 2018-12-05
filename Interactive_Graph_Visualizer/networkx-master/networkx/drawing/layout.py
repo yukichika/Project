@@ -479,9 +479,6 @@ def _fruchterman_reingold_revised(A,all_node_weights, k=None, pos=None, fixed=No
 		#for i in topn_ind:
 		#	hits_comp[i]=10
 		hits_comp=hits_scores
-		print(hits_comp)
-		print(hits_comp.shape)
-
 		return np.transpose(np.transpose(delta) *
 									(lamb*(k * k*hits_comp/ ((distance**2)*all_node_weights_) ) - (1-lamb)*A_ * distance / (k*hits_comp))
 									).sum(axis=1)
