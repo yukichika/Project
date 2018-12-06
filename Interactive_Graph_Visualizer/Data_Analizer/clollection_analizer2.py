@@ -57,8 +57,8 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 		pca.fit(theta)
 		theta_pca = pca.transform(theta)
 		reg_theta_pca = (theta_pca-theta_pca.min())/(theta_pca.max()-theta_pca.min())#0~1に正規化
-		# cmap = cm.jet_r
-		cmap = cm.jet
+		cmap = cm.jet_r
+		# cmap = cm.jet
 
 	"""1行目（項目名)の追加"""
 	for i,param in enumerate(tgt_params):

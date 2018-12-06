@@ -477,6 +477,7 @@ def main(args):
 	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
 
 
+
 	"""
 	weight_type:["ATTR"(斥力計算に重みall_node_weightsを使う),
 	　　　　　　　　"REPUL（引力計算にエッジの重みweightを使う）",

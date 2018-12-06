@@ -120,7 +120,7 @@ def suffix_generator(target=None,is_largest=False):
 if __name__ == "__main__":
 	"""収集したリンク情報をnx形式に変換"""
 	search_word = "iPhone"
-	max_page = 400
+	max_page = 4
 	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs"
 
 	is_largest = True#リンクから構築したグラフのうち，最大サイズのモノのみを使う場合True

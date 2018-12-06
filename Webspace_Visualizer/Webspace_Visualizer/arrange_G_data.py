@@ -113,7 +113,7 @@ def suffix_generator(target=None,is_largest=False):
 if __name__=="__main__":
 	params = {}
 	params["search_word"] = u"iPhone"
-	params["max_page"] = 400
+	params["max_page"] = 4
 	params["root_dir"] = ur"/home/yukichika/ドキュメント/Data/Search_" + params["search_word"] + "_" + unicode(params["max_page"]) + "_add_childs"
 
 	params["is_largest"] = True
