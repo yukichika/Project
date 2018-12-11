@@ -18,7 +18,6 @@ tqdm 4.28.1
 収集したWebページに対する可視化前のスクリプト．  
 基本的にseries_act.pyを使用．  
 
-```
 cvt_to_nxtype2.py  
 収集したWebページのデータ（json形式）をnetworkxの形式に変換．  
 
@@ -34,5 +33,5 @@ bhitsを計算するために，リンク先・リンク元のドメインをGに反映.
 
 calc_HITS.py  
 ノードのHITSスコアを計算して，neworkxに反映．  
-```
+
 
