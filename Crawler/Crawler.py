@@ -363,7 +363,6 @@ def check_url_id_dict(root_dir,dict_name="url_id_dict.pkl"):
         with open(file,'rb') as fi:
             pg = pickle.load(fi)
         print("取得URL数：" + str(len(pg.id_dict)))
-        # print(pg.id_dict)
     else:
         print("Not crawled.")
 

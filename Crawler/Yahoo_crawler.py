@@ -169,10 +169,9 @@ def search(searchwordlist,max_collect=None,sleep_time=10):
                 break
     return urls
 
-# def main():
-#     #searchwords = ['"http://docs.python.jp/3.3/library/re.html"']
-#     searchwords = ['"https://www.microsoft.com/surface/ja-jp/accessories/browse#accessories5"']
-#     urls = search(searchwords,max_collect=None,sleep_time=3)
+def main():
+    searchwords = ['"https://www.microsoft.com/surface/ja-jp/accessories/browse#accessories5"']
+    urls = search(searchwords,max_collect=None,sleep_time=3)
 
 if __name__ == "__main__":
     main()
