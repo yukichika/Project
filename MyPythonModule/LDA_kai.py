@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#from optparse import OptionParser
-import sys,  numpy
-#import copy
+import sys
+import numpy
 import scipy.special
 import datetime
+#from optparse import OptionParser
+#import copy
 
-digamma=scipy.special.psi#ディガンマ関数を定義(別名割り当て)
+digamma = scipy.special.psi#ディガンマ関数を定義(別名割り当て)
 
 class LDA:
 	def __init__(self, K, alpha, beta):
@@ -27,14 +28,14 @@ class LDA:
 		return voca_id
 
 	def term_to_ids(self,terms):
-		doc=[]
+		doc = []
 		for term in terms:
-			id=self.term_to_id(term)
+			id = self.term_to_id(term)
 			doc.append(id)
 
 		"""docの重複をなくして，出現語彙のカウントを+1"""
 		for v in set(doc):
-			self.n_v[v]+=1
+			self.n_v[v] += 1
 
 		return doc
 
@@ -50,33 +51,33 @@ class LDA:
 		self.vocas_id = dict()
 
 		"""語彙ごとの個数．はじめに整理するときのみに使う.selfにしたら結局pickleを圧迫する気がするが無視"""
-		self.n_v=[]
+		self.n_v = []
 
 		#self.labels = numpy.array([self.complement_label(label) for label in labels])
 		self.docs = [self.term_to_ids(doc) for doc in corpus]#文書をIDに変えて行列に突っ込む.vocasも更新される
 
 		"""辞書から高・低出現頻度の単語を削除するため，削除する単語のリストを作る．"""
-		high_threshold_cnt=len(self.docs)*(1-no_above)
+		high_threshold_cnt = len(self.docs)*(1-no_above)
 
-		omit_v_ids=[x for x,y in enumerate(self.n_v) if (y<=no_below or high_threshold_cnt<=y)]
+		omit_v_ids = [x for x,y in enumerate(self.n_v) if (y<=no_below or high_threshold_cnt<=y)]
 		#omit_words=[self.vocas[x] for x,y in enumerate(self.n_v) if y<=word_threshold]
 		print "made words",datetime.datetime.today().now()
 
 		"""コーパスを作り直す"""
-		corpus=[[self.vocas[term] for term in doc if term not in omit_v_ids] for doc in self.docs]#やっぱここがアホみたいに時間食う
-		#corpus=[[term for term in doc_c if term not in omit_words] for doc_c in corpus]#こっちのほうがまだまし？そうでもなかった
+		corpus = [[self.vocas[term] for term in doc if term not in omit_v_ids] for doc in self.docs]#やっぱここがアホみたいに時間食う
+		#corpus = [[term for term in doc_c if term not in omit_words] for doc_c in corpus]#こっちのほうがまだまし？そうでもなかった
 
 		print "made corpus",datetime.datetime.today().now()
 
 		"""中身が一定数以下の文書を排除し，文書番号の変換表を作成"""
-		newid_to_oldid_dict={}
-		new_corpus=[]
-		newid=0
+		newid_to_oldid_dict = {}
+		new_corpus = []
+		newid = 0
 		for oldid,doc in enumerate(corpus):
 			if len(doc) > no_less:
 				new_corpus.append(doc)
-				newid_to_oldid_dict[newid]=oldid
-				newid+=1
+				newid_to_oldid_dict[newid] = oldid
+				newid += 1
 
 		"""vocasのインデックスが変わるため，再度割り当て"""
 		self.vocas = []
@@ -89,17 +90,17 @@ class LDA:
 
 		"""文書の番号と実際の文書名の対応付けを保存"""
 		if file_id_dict == {}:
-			#self.file_id_dict=dict(zip(range(len(docs),range(len(docs)))))
-			self.file_id_dict=newid_to_oldid_dict
+			#self.file_id_dict = dict(zip(range(len(docs),range(len(docs)))))
+			self.file_id_dict = newid_to_oldid_dict
 		else:
-			newid_to_docname_dict={}
+			newid_to_docname_dict = {}
 			for k,v in newid_to_oldid_dict.items():
-				newid_to_docname_dict[k]=file_id_dict[v]
-			self.file_id_dict=newid_to_docname_dict;
+				newid_to_docname_dict[k] = file_id_dict[v]
+			self.file_id_dict = newid_to_docname_dict;
 
 		self.alpha = numpy.zeros(self.K)+self.alpha#alphaをトピック数分のベクトルに拡張
 		#self.beta = numpy.zeros(V)+self.beta
-		#self.gamma=numpy.zeros(S)+self.gamma
+		#self.gamma = numpy.zeros(S)+self.gamma
 
 		self.z_m_n = []
 
@@ -125,7 +126,7 @@ class LDA:
 					z = numpy.random.multinomial(1, p_z / p_z.sum()).argmax() # z_mn を p_z からサンプリング
 					z_n.append(z)
 				else:
-					z=self.z_m_n[m][n]#これはリストなのでz_m_n[m,n]ではアクセスできない
+					z = self.z_m_n[m][n]#これはリストなのでz_m_n[m,n]ではアクセスできない
 				self.n_m_z[m, z] += 1
 				self.n_z_t[z, t] += 1
 				self.n_z[z] += 1
@@ -176,21 +177,21 @@ class LDA:
 
 	def hparam_update(self,do_alpha=True,do_beta=True):
 		V = len(self.vocas)
-		D=len(self.docs)
+		D = len(self.docs)
 
 		if do_alpha:
-			n_m=self.n_m_z.sum(axis=1)#行方向の総和．列ベクトルになりそうだが，shapeを見るに行ベクトル
-			alpha_cnt=0
+			n_m = self.n_m_z.sum(axis=1)#行方向の総和．列ベクトルになりそうだが，shapeを見るに行ベクトル
+			alpha_cnt = 0
 			while 1:
-				alpha_cnt+=1
-				old_alpha=self.alpha
-				sumalpha=self.alpha.sum()
-				denom_alpha=digamma(n_m+sumalpha).sum()-D*digamma(sumalpha)#これはalphaの計算において一定
-				self.alpha=self.alpha*(digamma(self.n_m_z+self.alpha).sum(0)-D*digamma(self.alpha))/denom_alpha#これでいけるはず
-				if abs(self.alpha-old_alpha).sum()<0.001:
+				alpha_cnt += 1
+				old_alpha = self.alpha
+				sumalpha = self.alpha.sum()
+				denom_alpha = digamma(n_m+sumalpha).sum()-D*digamma(sumalpha)#これはalphaの計算において一定
+				self.alpha = self.alpha*(digamma(self.n_m_z+self.alpha).sum(0)-D*digamma(self.alpha))/denom_alpha#これでいけるはず
+				if abs(self.alpha-old_alpha).sum() < 0.001:
 					print "alpha_cnt=%d"%alpha_cnt
 					break
-				if alpha_cnt>1000:
+				if alpha_cnt > 1000:
 					print "alpha_cnt_over1000"
 					break
 			print "alpha="
@@ -201,20 +202,20 @@ class LDA:
 			#print self.alpha
 
 		if do_beta:
-			beta_cnt=0
+			beta_cnt = 0
 			while 1:
-				beta_cnt+=1
-				old_beta=self.beta
-				betaV=self.beta*V
-				self.beta=self.beta*(digamma(self.n_z_t+self.beta).sum()-self.K*V*digamma(self.beta))/(V*(digamma(self.n_z+betaV).sum()-self.K*digamma(betaV)))
-				if(self.beta<0):
+				beta_cnt += 1
+				old_beta = self.beta
+				betaV = self.beta*V
+				self.beta = self.beta*(digamma(self.n_z_t+self.beta).sum()-self.K*V*digamma(self.beta))/(V*(digamma(self.n_z+betaV).sum()-self.K*digamma(betaV)))
+				if(self.beta < 0):
 					sys.stderr.write("beta_minus")
-					dummy=-1
-				if abs(self.beta-old_beta)<0.0001:
+					dummy =- 1
+				if abs(self.beta-old_beta) < 0.0001:
 					print "beta_cnt=%d"%beta_cnt
 					print "beta=%f"%self.beta
 					break
-				if beta_cnt>1000:
+				if beta_cnt > 1000:
 					print "beta_cnt_over1000"
 					break
 

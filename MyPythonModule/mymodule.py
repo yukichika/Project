@@ -16,11 +16,11 @@ def tounicode(data):
 		try: return f(data, codec)
 		except: continue
 	return None
-	
-def sort_nicely( l ): 
-	""" Sort the given list in the way that humans expect. """ 
-	convert = lambda text: int(text) if text.isdigit() else text 
-	alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+
+def sort_nicely( l ):
+	""" Sort the given list in the way that humans expect. """
+	convert = lambda text: int(text) if text.isdigit() else text
+	alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
 	l.sort( key=alphanum_key )
 
 def getVarsNames( _vars, symboltable ) :
@@ -45,7 +45,7 @@ def getVarName( var, symboltable, error=None ) :
 def save_option(option_dict,path=os.getcwd(),value_name=None):
 	"""書き出しファイルの確認"""
 	if os.path.isdir(path):
-		path=os.path.join(path,"option_params.txt")
+		path = os.path.join(path,"option_params.txt")
 	try:
 		os.path.exists(path)
 		#if os.path.exists(path):
@@ -57,19 +57,19 @@ def save_option(option_dict,path=os.getcwd(),value_name=None):
 
 	with open(path,"w") as fo:
 		if value_name != None:
-			print>>fo,u"var name:",value_name
-		print>>fo,"{"
+			print >> fo,u"var name:",value_name
+		print >> fo,"{"
 		for k,v in option_dict.items():
 			if (type(k) is not unicode) and (type(k) is not str):#keyが文字列でなければスルー
 				continue
 
 			try:
-				v_str=unicode(v)
+				v_str = unicode(v)
 			except:
-				v_str="get error"
-			print>>fo,k,":",v_str
-		print>>fo,"}"
+				v_str = "get error"
+			print >> fo,k,":",v_str
+		print >> fo,"}"
 
 if __name__ =="__main__":
-	test_dict={"aaa":"b","ccc":10}
+	test_dict = {"aaa":"b","ccc":10}
 	save_option(test_dict)
