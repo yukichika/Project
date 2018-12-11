@@ -68,8 +68,6 @@ if __name__ == "__main__":
 	print("-----収集したリンク情報をnx形式に変換-----")
 	cvt_to_nxtype2.main(root_dir=root_dir,sel_largest=is_largest,G_name=G_name,rem_selfloop=True,use_to_link=use_to_link)
 
-
-	"""Subclass_Summarizer用のLDA実行"""
 	"""LDAパラメータの設定"""
 	K = int(inifile.get('lda','K'))
 	iteration = int(inifile.get('lda','iteration'))
