@@ -471,7 +471,8 @@ def main(args):
 	params["K"] = 10
 	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
 
-	params["comp_func_name"] = "comp4_2"
+	# params["comp_func_name"] = "comp4_2"
+	params["comp_func_name"] = "cos_sim"
 	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
 	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
 	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
@@ -506,7 +507,7 @@ def main(args):
 	params["draw_option"] = {
 		# "weight_type":[],
 
-		"weight_type":["ATTR","REPUL"],
+		# "weight_type":["ATTR","REPUL"],
 
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},

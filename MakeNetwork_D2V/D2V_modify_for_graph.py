@@ -6,12 +6,13 @@ import cPickle as pickle
 import configparser
 import codecs
 from distutils.util import strtobool
-import MeCab
+import numpy as np
+from tqdm import tqdm
 
 import sys
-sys.path.append("../../MyPythonModule")
+sys.path.append("../MyPythonModule")
 import mymodule
-sys.path.append("../../Interactive_Graph_Visualizer/networkx-master")
+sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
 import networkx as nx
 
 # import cvt_to_nxtype2
@@ -20,6 +21,10 @@ import networkx as nx
 # import calc_HITS
 # import make_network_by_nx
 # import clollection_analizer
+
+"""コサイン類似度"""
+def cos_sim(v1, v2):
+	return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
 
 """保存名の決定（root_dir）"""
 def suffix_generator_root(search_word,max_page,add_childs,append):
@@ -40,23 +45,10 @@ def suffix_generator(target=None,is_largest=False):
 		suffix += "_largest"
 	return suffix
 
-def words_list(text):
-	mecab = MeCab.Tagger("-Ochasen")
-	lines = mecab.parse(text).splitlines()
-	allwords = []
-	for line in lines:
-		chunks = line.split('\t')
-		if not chunks[0] == "\ufeff":#UTF-8の識別子\ufeff
-			allwords.append(chunks[0])
-	return allwords
-
-def cos_sim(v1, v2):
-	return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
-
 if __name__ == "__main__":
 	"""設定ファイルの読み込み"""
 	inifile = configparser.ConfigParser(allow_no_value = True,interpolation = configparser.ExtendedInterpolation())
-	inifile.readfp(codecs.open("./series_act.ini",'r','utf8'))
+	inifile.readfp(codecs.open("./D2V.ini",'r','utf8'))
 
 	"""検索パラメータの設定"""
 	search_word = inifile.get('options','search_word')
@@ -81,37 +73,44 @@ if __name__ == "__main__":
 	G_path = "G_with_params_" + comp_func_name + ".gpkl"
 
 	"""ファイルの読み込み"""
-	with open(os.path.join(exp_dir,"instance.pkl")) as fi:
-	   lda = pickle.load(fi)
-	with open(os.path.join(nx_dir,G_path)) as fi:
+	with open(os.path.join(exp_dir,"instance.pkl"),'r') as fi:
+		lda = pickle.load(fi)
+	with open(os.path.join(exp_dir,"doc2vec.pkl"),'rb') as fi:
+		d2v = pickle.load(fi)
+	with open(os.path.join(nx_dir,G_path),'r') as fi:
 		G = pickle.load(fi)
 
 	file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}
 
-	DEFAULT_WEIGHT = 0.5
 	"""エッジ間の距離算出"""
 	edges = G.edge
 	for node_no,link_node_nos in edges.items():
-		vec_no = file_id_dict_inv.get(node_no)#ファイルが連番でない対象に対応
-		p_dst = vectors[vec_no]
+		p_dst = d2v[node_no]
 		"""類似度による重みの算出"""
 		for link_node_no in link_node_nos.keys():
-			link_vec_no = file_id_dict_inv.get(link_node_no)#ファイルが連番でない対象に対応
-			q_dst = theta[link_vec_no]
-			weight = compare(p_dst,q_dst)
+			q_dst = d2v[link_node_no]
+			weight = cos_sim(p_dst,q_dst)
 			edges[node_no][link_node_no]["weight"] = weight
 
-		# """ベクトル化"""
-		# INPUT_MODEL = u"/home/yukichika/ドキュメント/Doc2vec_model/Wikipedia809710_dm_100_w5_m5_20.model"
-		# model = models.Doc2Vec.load(INPUT_MODEL)
-	    #
-		# vectors = []
-		# targets = os.listdir(Myexttext_pre)
-		# Mymodule.sort_nicely(targets)
-		# for file in targets:
-		# 	node_no = file.split(".")[0]
-		# 	with open(os.path.join(Myexttext_pre,file),'r') as fi:
-		# 		text = fi.read()
-		# 		words = Wakati.words_list(text)
-		# 		vector = model.infer_vector(words)
-		# 		print(len(vector))
+	DEFAULT_WEIGHT = 0.5
+	"""全ノード間距離算出．上といろいろ重複するが面倒なのでもう一度ループ"""
+	nodes = G.node
+	nodes_lim = len(nodes)#removeしている場合があるため
+	print(nodes_lim)
+	all_node_weights = np.ones((nodes_lim,nodes_lim))*DEFAULT_WEIGHT#除算の都合上，自分自身との類似度は1に
+	for i,i_node in enumerate(tqdm(nodes)):
+		p_dst = d2v[i_node]
+		for j,j_node in enumerate(nodes):
+			q_dst = d2v[j_node]
+			weight = cos_sim(p_dst,q_dst)
+			if weight == 0:
+				weight = 0.001
+			all_node_weights[i,j] = weight
+			#all_node_weights[i,j] = all_node_weights[j,i]=weight
+			weights_list.append(weight)#ヒストグラム作成用
+
+	"""データの書き出し"""
+	with open(os.path.join(nx_dir,"G_with_params_cos_sim.gpkl"),'w') as fo:
+		pickle.dump(G,fo)
+	with open(os.path.join(nx_dir,"all_node_weights_cos_sim.gpkl"),'w') as fo:
+		pickle.dump(all_node_weights,fo)
