@@ -95,7 +95,10 @@ def compare2(p,q):
 def compare3(p,q):
 	return np.minimum(p,q).sum()
 
-"""ユークリッド距離版"""
+"""
+類似度の計算方法4．
+ユークリッド距離版
+"""
 def compare4_1(p,q):
 	weight = (1/(((p-q)**2).sum()+0.01))*0.01
 	return weight
@@ -130,10 +133,12 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 	if not os.path.exists(root_dir):
 		print "root_dir",root_dir,"is not exist"
 		exit()
+
 	exp_dir = os.path.join(root_dir,exp_name)
 	if not os.path.exists(exp_dir):
 		print "exp_dir",exp_dir,"is not exist"
 		exit()
+
 	nx_dir = os.path.join(exp_dir,"nx_datas")
 	if os.path.exists(nx_dir):
 		print "LDA_modfy_for_graph is already finished"
@@ -147,7 +152,7 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 
 	"""ファイルの読み込み"""
 	with open(os.path.join(exp_dir,"instance.pkl")) as fi:
-	   lda = pickle.load(fi)
+		lda = pickle.load(fi)
 	with open(os.path.join(root_dir,G_path)) as fi:
 		G = pickle.load(fi)
 
@@ -158,9 +163,7 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 
 	old_node_num = len(G.node.keys())
 
-	#以下ノードごとのトピック分布円グラフ描画用
 	theta = lda.theta()
-	#labels = [unicode(x+1) for x in range(lda.K)]
 
 	for m,z_m in enumerate(lda.z_m_n[:nodes_lim]):
 		node_no = lda.file_id_dict.get(m)#ファイルが連番でない対象に対応
@@ -207,10 +210,6 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 
 			with open(os.path.join(root_dir,"file_id_list2.list"),"w") as fo:
 				pickle.dump(list(G.node.keys()),fo)
-			with open(os.path.join(root_dir,"file_id_list2.txt"),"w") as fo:
-				print >> fo,"最大ノード群　=>　LDAをかけたのちの最大ノード群"
-				print >> fo,"この時点でのノードidのリストを格納．"
-
 
 	new_node_num = len(G.node.keys())
 
@@ -251,7 +250,6 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 			if weight == 0:
 				weight = 0.001
 			all_node_weights[i,j] = weight
-			#all_node_weights[i,j] = all_node_weights[j,i]=weight
 			weights_list.append(weight)#ヒストグラム作成用
 
 	"""データの書き出し"""
@@ -259,15 +257,18 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 		pickle.dump(G,fo)
 	with open(os.path.join(nx_dir,"all_node_weights_" + comp_func_name + ".gpkl"),'w') as fo:
 		pickle.dump(all_node_weights,fo)
-	with open(os.path.join(nx_dir,"G_with_params_" + comp_func_name + ".txt"),'w') as fo:
-		print >> fo,"LDAを実行した後，LDAの結果がないノードを削除し，最大ノード群を再選択"
-		print >> fo,"この時点で、ノードには代表トピックとその色、エッジには重みの情報を渡している。"
-		print >> fo,"old_node_number:" + str(old_node_num) + "（G_myexttext_largest.gpkl）"
-		print >> fo,"len(lda.theta()):" + str(len(lda.theta())) + "（ldaにかけた文書数）"
-		print >> fo,"new_node_number:" + str(new_node_num) + "（G_with_params_comp4_2.gpkl）"
 
+	with open(os.path.join(root_dir,"Progress.txt"),'a') as fo:
+		print >> fo,"-----LDA_modify_for_graph.py-----"
+		print >> fo,"LDAの結果がないノードを削除=>最大ノード群を再選択"
+		print >> fo,"この時点で、ノードには代表トピックとその色、エッジには重みの情報を渡している。"
+		print >> fo,"len(lda.theta()):" + str(len(lda.theta())) + "（ldaにかけた文書数）"
+		print >> fo,"old_node_number:" + str(old_node_num) + "（G_myexttext_largest.gpkl）"
+		print >> fo,"new_node_number:" + str(new_node_num) + "（G_with_params_comp4_2.gpkl）"
+		print >> fo,"file_id_list2.list=>この時点でのノードidのリストを格納．"
+
+	print "LDAにかけた文書数：" + str(len(lda.theta()))
 	print "旧ノード数：" + str(old_node_num)
-	print "len(lda.theta())：" + str(len(lda.theta()))
 	print "新ノード数：" + str(new_node_num)
 
 	"""weight（全ノード間の距離）のヒストグラム作成"""
@@ -284,8 +285,8 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 	トピックの可視化に役立つものを生成する．
 	・トピックと色の対応グラフ
 	・文書全体におけるトピックの配合率
-	・各トピックを代表トピックとして持つ文書のタイトル
 	"""
+
 	""""トピックと色の対応グラフを作成"""
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)

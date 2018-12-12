@@ -97,13 +97,12 @@ def make_chasens(root_dir,target="text",target_list=[],chasen_dir_name="chasen")
 			for word in doc:
 				print >> fo,word.encode("utf-8")
 
-		# print "file",i,"finish"
-
 	with open(os.path.join(root_dir,"file_id_dict.dict"),"w") as fo:
 		pickle.dump(file_id_dict,fo)
-	with open(os.path.join(root_dir,"file_id_dict.txt"),"w") as fo:
-		print >> fo,"LDAに用いるためのコーパス作成"
-		print >> fo,"キーがLDAの番号，要素がノードidの辞書を格納．"
+	with open(os.path.join(root_dir,"Progress.txt"),"a") as fo:
+		print >> fo,"-----LDA_for_SS.make_chasens-----"
+		print >> fo,"file_id_list.listに格納されたidの文書から一般名詞のみを抽出して保存"
+		print >> fo,"file_id_dict.dict=>キーがLDAの番号，要素がノードidの辞書を格納．"
 		print >> fo,"len(file_id_dict):" + str(len(file_id_dict))
 
 
@@ -141,7 +140,6 @@ def main(root_dir,K,iteration,smartinit,no_below=5,no_above=0.5,no_less=1,alpha=
 	if not os.path.exists(chasen_dir):
 		print ("chasen dir is not exist.boot make_chasen")
 		exit()
-		#make_chasens(root_dir,target_list=target_list)
 
 	if exp_name == None:
 		exp_name = "K" + unicode(K) + "_freqcut3" #+"_"+unicode(try_no)
@@ -241,6 +239,11 @@ if __name__=="__main__":
 	search_word = "iPhone"
 	max_page = 10
 	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs"
+
+	# file_id_list = []
+	# if is_largest == True:
+	# 	with open(os.path.join(root_dir,"file_id_list.list")) as fi:
+	# 	   file_id_list = pickle.load(fi)
 
 	# make_chasens(root_dir,target_list=file_id_list)
 	# main(root_dir=root_dir,K=K,iteration=iteration,smartinit=True,no_below=no_below,no_above=no_above,alpha=alpha,beta=beta,target_list=file_id_list)

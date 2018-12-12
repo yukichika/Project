@@ -14,9 +14,6 @@ import cPickle as pickle
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-#import numpy as np
-#import glob
-
 import sys
 sys.path.append("../MyPythonModule")
 import mymodule
@@ -98,17 +95,17 @@ def cvt_jsonfiles_to_G(src_pages_dir,use_to_link="childs",use_from_link=None,rem
 	return G,old_node_num,new_node_num
 
 """作ったネットワークの確認用"""
-# def check_network(root_dir,pkl_name="G.gpkl"):
-# 	with open(os.path.join(root_dir,pkl_name),"r") as fi:
-# 		G = pickle.load(fi)
-#
-# 	print "len(nodes)=",len(G.node.keys())
-# 	pos = nx.spring_layout(G)#描画位置はここで確定,全ノードの重みを1にするので重みがかかるのは引力計算のみ
-# 	nx.draw(G,pos,with_labels=True,node_color="w",allows=True)
-# 	# nx.draw_networkx_edges(G,pos=pos)
-# 	# nx.draw_networkx(G,pos=pos)
-# 	plt.savefig(os.path.join(root_dir,pkl_name.split(".")[0] + '.png'))
-# 	plt.show()
+def check_network(root_dir,pkl_name="G.gpkl"):
+	with open(os.path.join(root_dir,pkl_name),"r") as fi:
+		G = pickle.load(fi)
+
+	print "len(nodes)=",len(G.node.keys())
+	pos = nx.spring_layout(G)#描画位置はここで確定,全ノードの重みを1にするので重みがかかるのは引力計算のみ
+	nx.draw(G,pos,with_labels=True,node_color="w",allows=True)
+	# nx.draw_networkx_edges(G,pos=pos)
+	# nx.draw_networkx(G,pos=pos)
+	plt.savefig(os.path.join(root_dir,pkl_name.split(".")[0] + '.png'))
+	plt.show()
 
 def main(root_dir,sel_largest=True,G_name="G",rem_selfloop=True,use_to_link="childs",use_from_link=None):
 	dst_pkl_name = G_name + ".gpkl"
@@ -133,9 +130,6 @@ def main(root_dir,sel_largest=True,G_name="G",rem_selfloop=True,use_to_link="chi
 	if sel_largest == True:
 		with open(os.path.join(root_dir,"file_id_list.list"),"w") as fo:
 			pickle.dump(list(G.node.keys()),fo)
-		with open(os.path.join(root_dir,"file_id_list.txt"),"w") as fo:
-			print >> fo,"全ノード（Webページ）　=>　最も多くWebページを含むノード群を選択．"
-			print >> fo,"この時点でのノードidのリストを格納．"
 
 	"""
 	一旦グラフ形式にまとめてから保存
@@ -145,10 +139,12 @@ def main(root_dir,sel_largest=True,G_name="G",rem_selfloop=True,use_to_link="chi
 		pickle.dump(G,fo)
 
 	"""ノード数の変化を保存"""
-	with open(os.path.join(root_dir,G_name + ".txt"),"w") as fo:
-		print >> fo,"全Webページから最大のノード群を採用"
+	with open(os.path.join(root_dir,"Progress.txt"),"a") as fo:
+		print >> fo,"-----cvt_to_nxtypee2.py-----"
+		print >> fo,"全Webページのネットワークを構築=>最大ノード群を選定"
 		print >> fo,"old_node_number:" + str(old_node_num)
-		print >> fo,"new_node_number:" + str(new_node_num) + "（G_myexttext_largest.gpkl）"
+		print >> fo,"new_node_number:" + str(new_node_num) + "（G_myexttext_largest.gpklに保存）"
+		print >> fo,"file_id_list.list=>この時点でのノードidのリストを格納．"
 
 	print "旧ノード数：" + str(old_node_num)
 	print "新ノード数：" + str(new_node_num)
@@ -159,6 +155,7 @@ if __name__ == "__main__":
 	search_word = "iPhone"
 	max_page = 10
 	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs"
+	sel_largest = True
+	G_name = "G_myexttext_largest"
 
-	# main(root_dir=root_dir,sel_largest=True,G_name="G_largest")
-	# check_network(root_dir,pkl_name="G_largest.gpkl")
+	# main(root_dir=root_dir,sel_largest=sel_largest,G_name=G_name)

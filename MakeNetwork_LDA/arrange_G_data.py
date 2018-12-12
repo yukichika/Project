@@ -74,10 +74,12 @@ def main(params):
 
 	with open(src_gpkl_path,"w") as fo:
 		pickle.dump(G,fo)
-	with open(os.path.join(nx_dir,src_gpkl_path.split(".")[0] + "_hosts.txt"),"w") as fo:
-		print >> fo,"この時点で、ノードには代表トピックとその色とfrom_hostsとto_hostsをエッジには重みの情報を渡している。"
-		print >> fo,"from_hostはリンクされているWebページのドメインとその件数の辞書、to_hostsはリンクしているWebページのドメインとその件数の辞書。"
-		print >> fo,"ノード数：" + str(len(G.node.keys())) + "（変化なし）"
+	with open(os.path.join(root_dir,"Progress.txt"),"a") as fo:
+		print >> fo,"-----arrange_G_data.py-----"
+		print >> fo,"この時点で、ノードには代表トピックとその色、from_hosts、to_hostsをエッジには重みの情報を渡している。"
+		print >> fo,"from_host=>リンクされているWebページのドメインとその件数の辞書"
+		print >> fo,"to_hosts=>リンクしているWebページのドメインとその件数の辞書"
+		print >> fo,"ノード数：" + str(len(G.node.keys())) + "（G_with_params_comp4_2.gpkl）"
 
 def del_keys(params):
 	root_dir = params.get("root_dir")

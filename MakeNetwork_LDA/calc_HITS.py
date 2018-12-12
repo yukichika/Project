@@ -89,16 +89,18 @@ def main(search_word,src_pkl_name,exp_name,root_dir,weight_key="weight",use_bhit
 
 	if use_bhits is True:
 		h_scores,a_scores = nx.bhits(G,weight_key=weight_key)
-		with open(os.path.join(nx_dir,src_pkl_name.split(".")[0] + "_hosts_bhits.txt"),"w") as fo:
-			print >> fo,"この時点で、ノードには代表トピックとその色とfrom_hostsとto_hostsとオーソリティ・ハブスコア、エッジには重みの情報を渡している。"
-			print >> fo,"ノード数：" + str(len(G.node.keys())) + "（変化なし）"
+		with open(os.path.join(root_dir,"Progress.txt"),"a") as fo:
+			print >> fo,"-----calc_HITS.py-----"
+			print >> fo,"この時点で、ノードには代表トピックとその色、from_hosts、to_hosts、オーソリティ・ハブスコア、エッジには重みの情報を渡している。"
+			print >> fo,"ノード数：" + str(len(G.node.keys())) + "（G_with_params_comp4_2.gpkl）"
 			print >> fo,"weight_key:" + weight_key
 			print >> fo,"use_bhits:" + str(use_bhits)
 	else:
 		h_scores,a_scores = nx.hits(G,weight_key=weight_key)
-		with open(os.path.join(nx_dir,src_pkl_name.split(".")[0] + "_hosts_hits.txt"),"w") as fo:
-			print >> fo,"この時点で、ノードには代表トピックとその色とfrom_hostsとto_hostsとオーソリティ・ハブスコア、エッジには重みの情報を渡している。"
-			print >> fo,"ノード数：" + str(len(G.node.keys())) + "（変化なし）"
+		with open(os.path.join(root_dir,"Progress.txt"),"a") as fo:
+			print >> fo,"-----calc_HITS.py-----"
+			print >> fo,"この時点で、ノードには代表トピックとその色、from_hosts、to_hosts、オーソリティ・ハブスコア、エッジには重みの情報を渡している。"
+			print >> fo,"ノード数：" + str(len(G.node.keys())) + "（G_with_params_comp4_2.gpkl）"
 			print >> fo,"weight_key:" + weight_key
 			print >> fo,"use_bhits:" + str(use_bhits)
 
@@ -134,6 +136,6 @@ if __name__ == "__main__":
 	weight_key = "no_weight"
 	use_bhits = False
 
-	# main(search_word,src_pkl_name,exp_name,root_dir,weight_key=weight_key,use_bhits=use_bhits)
+	#main(search_word,src_pkl_name,exp_name,root_dir,weight_key=weight_key,use_bhits=use_bhits)
 	#use_to_link="childs"
 	#calc_hits_from_redefined_G(search_word,src_pkl_name,exp_name,root_dir,use_to_link=use_to_link)
