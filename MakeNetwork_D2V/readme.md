@@ -21,7 +21,7 @@ matplotlib 1.5.1
 ```
 
 ## How to Use
-Preprocess_for_D2V.py（python3）  
+Preprocess_for_D2V.py(python3)  
 
-D2V_modify_for_graph.py（python2）  
+D2V_modify_for_graph.py(python2)  
 
