@@ -10,12 +10,12 @@ from tqdm import tqdm
 from gensim import models
 
 import sys
+sys.path.append("../Crawler")
+import Mymodule
 sys.path.append("../../Preprocessing")
 import Sentence
 import Delete
 import Wakati
-sys.path.append("../Crawler")
-import Mymodule
 
 """保存名の決定"""
 def suffix_generator_root(search_word,max_page,add_childs,append):
@@ -51,21 +51,15 @@ if __name__ == "__main__":
 	Myexttext_raw = os.path.join(root_dir,"Myexttext_raw")
 	Myexttext_pre = os.path.join(root_dir,"Myexttext_pre")
 
-	is_largest = strtobool(inifile.get('options','is_largest'))
-	target = inifile.get('options','target')
-	K = int(inifile.get('lda','K'))
-	exp_name = "K" + str(K) + suffix_generator(target,is_largest)
-	exp_dir = os.path.join(root_dir,exp_name)
-
 	"""前処理"""
 	if os.path.exists(Myexttext_pre):
 		print("preprocess finished.")
 	else:
-		os.makedir(Myexttext_pre)
+		os.mkdir(Myexttext_pre)
 
 		node_list = []
 		with open(os.path.join(root_dir,"file_id_list2.list"),'rb') as fi:
-		   node_list = pickle.load(fi)
+			node_list = pickle.load(fi)
 		print("ノード数：" + str(len(node_list)))
 
 		for node in tqdm(node_list):
@@ -77,19 +71,34 @@ if __name__ == "__main__":
 					fo.write(Delete.delete_wikipedia(sentence) + "\n")
 
 	"""ベクトル化"""
-	INPUT_MODEL = u"/home/yukichika/ドキュメント/Doc2vec_model/Wikipedia809710_dm_100_w5_m5_20.model"
-	model = models.Doc2Vec.load(INPUT_MODEL)
+	is_largest = strtobool(inifile.get('options','is_largest'))
+	target = inifile.get('options','target')
+	K = int(inifile.get('lda','K'))
+	exp_name = "K" + str(K) + suffix_generator(target,is_largest)
+	exp_dir = os.path.join(root_dir,exp_name)
 
-	vectors = {}
-	targets = os.listdir(Myexttext_pre)
-	Mymodule.sort_nicely(targets)
-	for file in targets:
-		node_no = int(file.split(".")[0])
-		with open(os.path.join(Myexttext_pre,file),'r') as fi:
-			text = fi.read()
-			words = Wakati.words_list(text)
-			vector = model.infer_vector(words)
-			vectors[node_no] = vector
+	size = int(inifile.get('lda','size'))
+	exp_name_new = "D" + str(size) + suffix_generator(target,is_largest)
+	exp_dir_new = os.path.join(root_dir,exp_name_new)
 
-	with open(os.path.join(exp_dir,"doc2vec.pkl"),'wb') as fo:
-		pickle.dump(vectors,fo,protocol=2)
+	if os.path.exists(exp_dir_new):
+		print("vectorize finished.")
+	else:
+		os.mkdir(exp_dir_new)
+
+		INPUT_MODEL = u"/home/yukichika/ドキュメント/Doc2vec_model/Wikipedia809710_dm_100_w5_m5_20.model"
+		model = models.Doc2Vec.load(INPUT_MODEL)
+
+		vectors = {}
+		targets = os.listdir(Myexttext_pre)
+		Mymodule.sort_nicely(targets)
+		for file in tqdm(targets):
+			node_no = int(file.split(".")[0])
+			with open(os.path.join(Myexttext_pre,file),'r') as fi:
+				text = fi.read()
+				words = Wakati.words_list(text)
+				vector = model.infer_vector(words)
+				vectors[node_no] = vector
+
+		with open(os.path.join(exp_dir_new,"doc2vec.pkl"),'wb') as fo:
+			pickle.dump(vectors,fo,protocol=2)

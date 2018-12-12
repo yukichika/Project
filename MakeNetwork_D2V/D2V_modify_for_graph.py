@@ -8,19 +8,13 @@ import codecs
 from distutils.util import strtobool
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 import sys
 sys.path.append("../MyPythonModule")
 import mymodule
 sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
 import networkx as nx
-
-# import cvt_to_nxtype2
-# import LDA_for_SS
-# import LDA_modify_for_graph
-# import calc_HITS
-# import make_network_by_nx
-# import clollection_analizer
 
 """コサイン類似度"""
 def cos_sim(v1, v2):
@@ -57,60 +51,75 @@ if __name__ == "__main__":
 	append = strtobool(inifile.get('options','append'))
 	save_dir = inifile.get('other_settings','save_dir')
 	root_dir = save_dir + suffix_generator_root(search_word,max_page,add_childs,append)
-	Myexttext_pre = os.path.join(root_dir,"Myexttext_pre")
 
 	is_largest = strtobool(inifile.get('options','is_largest'))
 	target = inifile.get('options','target')
 	K = int(inifile.get('lda','K'))
 	exp_name = "K" + unicode(K) + suffix_generator(target,is_largest)
-
-	comp_func_name = inifile.get('nx','comp_func_name')
-
 	exp_dir = os.path.join(root_dir,exp_name)
 	nx_dir = os.path.join(exp_dir,"nx_datas")
 
-	weights_list = []
-	G_path = "G_with_params_" + comp_func_name + ".gpkl"
+	size = int(inifile.get('lda','size'))
+	exp_name_new = "D" + str(size) + suffix_generator(target,is_largest)
+	exp_dir_new = os.path.join(root_dir,exp_name_new)
+	nx_dir_new = os.path.join(exp_dir_new,"nx_datas")
+	if os.path.exists(nx_dir_new):
+		print("D2V modify finished.")
+	else:
+		os.mkdir(nx_dir_new)
 
-	"""ファイルの読み込み"""
-	with open(os.path.join(exp_dir,"instance.pkl"),'r') as fi:
-		lda = pickle.load(fi)
-	with open(os.path.join(exp_dir,"doc2vec.pkl"),'rb') as fi:
-		d2v = pickle.load(fi)
-	with open(os.path.join(nx_dir,G_path),'r') as fi:
-		G = pickle.load(fi)
+		weights_list = []
 
-	file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}
+		comp_func_name = inifile.get('nx','comp_func_name')
+		G_path = "G_with_params_" + comp_func_name + ".gpkl"
 
-	"""エッジ間の距離算出"""
-	edges = G.edge
-	for node_no,link_node_nos in edges.items():
-		p_dst = d2v[node_no]
-		"""類似度による重みの算出"""
-		for link_node_no in link_node_nos.keys():
-			q_dst = d2v[link_node_no]
-			weight = cos_sim(p_dst,q_dst)
-			edges[node_no][link_node_no]["weight"] = weight
+		"""ファイルの読み込み"""
+		with open(os.path.join(exp_dir,"instance.pkl"),'r') as fi:
+			lda = pickle.load(fi)
+		with open(os.path.join(nx_dir,G_path),'r') as fi:
+			G = pickle.load(fi)
+		with open(os.path.join(exp_dir_new,"doc2vec.pkl"),'rb') as fi:
+			doc2vec_vectors = pickle.load(fi)
 
-	DEFAULT_WEIGHT = 0.5
-	"""全ノード間距離算出．上といろいろ重複するが面倒なのでもう一度ループ"""
-	nodes = G.node
-	nodes_lim = len(nodes)#removeしている場合があるため
-	print(nodes_lim)
-	all_node_weights = np.ones((nodes_lim,nodes_lim))*DEFAULT_WEIGHT#除算の都合上，自分自身との類似度は1に
-	for i,i_node in enumerate(tqdm(nodes)):
-		p_dst = d2v[i_node]
-		for j,j_node in enumerate(nodes):
-			q_dst = d2v[j_node]
-			weight = cos_sim(p_dst,q_dst)
-			if weight == 0:
-				weight = 0.001
-			all_node_weights[i,j] = weight
-			#all_node_weights[i,j] = all_node_weights[j,i]=weight
-			weights_list.append(weight)#ヒストグラム作成用
+		# file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}
 
-	"""データの書き出し"""
-	with open(os.path.join(nx_dir,"G_with_params_cos_sim.gpkl"),'w') as fo:
-		pickle.dump(G,fo)
-	with open(os.path.join(nx_dir,"all_node_weights_cos_sim.gpkl"),'w') as fo:
-		pickle.dump(all_node_weights,fo)
+		"""エッジ間の距離算出（ユークリッド距離=>コサイン類似度）"""
+		edges = G.edge
+		for node_no,link_node_nos in edges.items():
+			p_dst = doc2vec_vectors[node_no]
+			"""類似度による重みの算出"""
+			for link_node_no in link_node_nos.keys():
+				q_dst = doc2vec_vectors[link_node_no]
+				weight = cos_sim(p_dst,q_dst)
+				edges[node_no][link_node_no]["weight"] = weight
+
+		DEFAULT_WEIGHT = 0.5#
+		"""全ノード間距離算出．上といろいろ重複するが面倒なのでもう一度ループ（コサイン類似度）"""
+		nodes = G.node
+		nodes_lim = len(nodes)
+		all_node_weights = np.ones((nodes_lim,nodes_lim))*DEFAULT_WEIGHT#除算の都合上，自分自身との類似度は1に
+		for i,i_node in enumerate(tqdm(nodes)):
+			p_dst = doc2vec_vectors[i_node]
+			for j,j_node in enumerate(nodes):
+				q_dst = doc2vec_vectors[j_node]
+				weight = cos_sim(p_dst,q_dst)
+				if weight == 0:
+					weight = 0.001
+				all_node_weights[i,j] = weight
+				weights_list.append(weight)#ヒストグラム作成用
+
+		"""データの書き出し"""
+		with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'w') as fo:
+			pickle.dump(G,fo)
+		with open(os.path.join(nx_dir_new,"all_node_weights_cos_sim.gpkl"),'w') as fo:
+			pickle.dump(all_node_weights,fo)
+
+		"""weight（全ノード間の距離）のヒストグラム作成"""
+		fig_w = plt.figure()
+		ax = fig_w.add_subplot(1,1,1)
+		weights_array = np.array(weights_list,dtype=np.float)
+		ax.hist(weights_array,bins=100)
+		plt.text(0.5, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
+		plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
+		fig_w.show()
+		fig_w.savefig(os.path.join(nx_dir_new,"cos_sim_hist.png"))
