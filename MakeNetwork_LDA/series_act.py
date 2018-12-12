@@ -62,8 +62,8 @@ if __name__ == "__main__":
 	G_name = "G" + suffix_generator(target=target,is_largest=is_largest)
 	use_to_link = inifile.get('options','use_to_link')
 
-	# print("-----収集したリンク情報をnx形式に変換-----")
-	# cvt_to_nxtype2.main(root_dir=root_dir,sel_largest=is_largest,G_name=G_name,rem_selfloop=True,use_to_link=use_to_link)
+	print("-----収集したリンク情報をnx形式に変換-----")
+	cvt_to_nxtype2.main(root_dir=root_dir,sel_largest=is_largest,G_name=G_name,rem_selfloop=True,use_to_link=use_to_link)
 
 	"""LDAパラメータの設定"""
 	K = int(inifile.get('lda','K'))
@@ -83,8 +83,8 @@ if __name__ == "__main__":
 
 	"""jsonからchasenへ"""
 	chasen_dir_name = "Chasen" + suffix_generator(target,is_largest)
-	# print("-----jsonからchasenへ-----")
-	# LDA_for_SS.make_chasens(root_dir,target=target,chasen_dir_name=chasen_dir_name,target_list=file_id_list)
+	print("-----jsonからchasenへ-----")
+	LDA_for_SS.make_chasens(root_dir,target=target,chasen_dir_name=chasen_dir_name,target_list=file_id_list)
 
 	"""chasenからLDA実行"""
 	exp_name = "K" + unicode(K) + suffix_generator(target,is_largest)
@@ -92,18 +92,18 @@ if __name__ == "__main__":
 	if comment == "":
 		comment = None
 
-	# try:#2回目以降返値が返ってこないのでエラーになる.
-	# 	print("-----chasenからLDA実行-----")
-	# 	M,V,doclen_ave = LDA_for_SS.main(root_dir=root_dir,K=K,iteration=iteration,smartinit=True,no_below=no_below,no_above=no_above,no_less=no_less,alpha=alpha,beta=beta,target_list=file_id_list,chasen_dir_name=chasen_dir_name,exp_name=exp_name,do_hparam_update=do_hparam_update)
-	# 	status_writer(os.path.join(root_dir,exp_name),{"topic_num":K,"M":M,"V":V,"doclen_ave":doclen_ave,"iteration":iteration,"alpha":alpha,"beta":beta,"no_below":no_below,"no_above":no_above,"no_less":no_less,"is_largest":is_largest,"do_hparam_update":do_hparam_update},comment=comment)
-	# except:
-	# 	pass
+	try:#2回目以降返値が返ってこないのでエラーになる.
+		print("-----chasenからLDA実行-----")
+		M,V,doclen_ave = LDA_for_SS.main(root_dir=root_dir,K=K,iteration=iteration,smartinit=True,no_below=no_below,no_above=no_above,no_less=no_less,alpha=alpha,beta=beta,target_list=file_id_list,chasen_dir_name=chasen_dir_name,exp_name=exp_name,do_hparam_update=do_hparam_update)
+		status_writer(os.path.join(root_dir,exp_name),{"topic_num":K,"M":M,"V":V,"doclen_ave":doclen_ave,"iteration":iteration,"alpha":alpha,"beta":beta,"no_below":no_below,"no_above":no_above,"no_less":no_less,"is_largest":is_largest,"do_hparam_update":do_hparam_update},comment=comment)
+	except:
+		pass
 
 	"""LDA結果を重みとしてnxグラフに反映"""
 	comp_func_name = inifile.get('nx','comp_func_name')
 	void_node_remove = strtobool(inifile.get('nx','void_node_remove'))
-	# print("-----LDAの結果を重みとしてnxグラフに反映-----")
-	# LDA_modify_for_graph.main(root_dir=root_dir,exp_name=exp_name,comp_func_name=comp_func_name,G_name=G_name,void_node_remove=void_node_remove,is_largest=is_largest)#is_largestはremoveする際に効く
+	print("-----LDAの結果を重みとしてnxグラフに反映-----")
+	LDA_modify_for_graph.main(root_dir=root_dir,exp_name=exp_name,comp_func_name=comp_func_name,G_name=G_name,void_node_remove=void_node_remove,is_largest=is_largest)#is_largestはremoveする際に効く
 
 	"""bhitsのためにGデータに属性を追加"""
 	params = {}
@@ -122,8 +122,8 @@ if __name__ == "__main__":
 	params["src_pkl_name"] = src_pkl_name
 	params["weights_pkl_name"] = "all_node_weights_" + comp_func_name + ".gpkl"
 
-	# print("-----bhitsのためにGデータに属性を追加-----")
-	# arrange_G_data.main(params)
+	print("-----bhitsのためにGデータに属性を追加-----")
+	arrange_G_data.main(params)
 
 	"""hitsアルゴリズムの計算"""
 	weight_key = inifile.get('hits','weight_key')
