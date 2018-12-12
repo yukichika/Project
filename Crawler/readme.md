@@ -30,7 +30,7 @@ After_crawled_arrange.py
 Crawler.pyでも内部・外部リンクを指定して収集しているが，収集したページのドメインを定義しなおし，再選定を行う．  
 （childs→to_int_lins&to_ext_links）  
 
-# 取得一覧（jsonファイル）  
+## 取得一覧（jsonファイル）  
 ```
 url:取得ページのURL
 title:取得ページのタイトル
