@@ -55,6 +55,7 @@ if __name__ == "__main__":
 	if os.path.exists(Myexttext_pre):
 		print("preprocess finished.")
 	else:
+		print("-----preprocess-----")
 		os.mkdir(Myexttext_pre)
 
 		node_list = []
@@ -62,13 +63,27 @@ if __name__ == "__main__":
 			node_list = pickle.load(fi)
 		print("ノード数：" + str(len(node_list)))
 
+		# for node in tqdm(node_list):
+		# 	with open(os.path.join(Myexttext_raw,str(node) + ".txt"),'r') as fi:
+		# 		text = fi.read()
+		# 	sentences = Sentence.sentence(text)
+		# 	with open(os.path.join(Myexttext_pre,str(node) + ".txt"),'w') as fo:
+		# 		for sentence in sentences:
+		# 			fo.write(Delete.delete_wikipedia(sentence) + "\n")
+
 		for node in tqdm(node_list):
 			with open(os.path.join(Myexttext_raw,str(node) + ".txt"),'r') as fi:
 				text = fi.read()
 			sentences = Sentence.sentence(text)
 			with open(os.path.join(Myexttext_pre,str(node) + ".txt"),'w') as fo:
 				for sentence in sentences:
-					fo.write(Delete.delete_wikipedia(sentence) + "\n")
+					words = Wakati.wakati(sentence).split(" ")
+					for i,word in enumerate(words):
+						word = Delete.delete_wikipedia(word)
+						if not word == "":
+							fo.write(word + " ")
+						elif i == len(words)-1:
+							fo.write("\n")
 
 	"""ベクトル化"""
 	is_largest = strtobool(inifile.get('options','is_largest'))
@@ -84,6 +99,7 @@ if __name__ == "__main__":
 	if os.path.exists(exp_dir_new):
 		print("vectorize finished.")
 	else:
+		print("-----vectorize-----")
 		os.mkdir(exp_dir_new)
 
 		INPUT_MODEL = u"/home/yukichika/ドキュメント/Doc2vec_model/Wikipedia809710_dm_100_w5_m5_20.model"
@@ -92,13 +108,24 @@ if __name__ == "__main__":
 		vectors = {}
 		targets = os.listdir(Myexttext_pre)
 		Mymodule.sort_nicely(targets)
+
+		# for file in tqdm(targets):
+		# 	node_no = int(file.split(".")[0])
+		# 	with open(os.path.join(Myexttext_pre,file),'r') as fi:
+		# 		text = fi.read()
+		# 		words = Wakati.words_list(text)
+		# 		vector = model.infer_vector(words)
+		# 		vectors[node_no] = vector
+
 		for file in tqdm(targets):
 			node_no = int(file.split(".")[0])
 			with open(os.path.join(Myexttext_pre,file),'r') as fi:
-				text = fi.read()
-				words = Wakati.words_list(text)
-				vector = model.infer_vector(words)
-				vectors[node_no] = vector
+				lines = fi.readlines()
+				words = []
+				for line in lines:
+					words.extend(line.split(" "))
+					vector = model.infer_vector(words)
+					vectors[node_no] = vector
 
 		with open(os.path.join(exp_dir_new,"doc2vec.pkl"),'wb') as fo:
 			pickle.dump(vectors,fo,protocol=2)
