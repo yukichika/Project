@@ -382,7 +382,6 @@ if  __name__ == "__main__":
     else:
         append_words = append_words.split(",")
 
-
     """設定"""
     options = {"search_word":search_word,
                "max_page":max_page,
@@ -401,4 +400,4 @@ if  __name__ == "__main__":
     root_dir = save_dir + suffix_generator(options)
 
     main(search_word=options["search_word"],root_dir=root_dir,options=options)
-    # check_url_id_dict(root_dir)
+    check_url_id_dict(root_dir)

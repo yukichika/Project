@@ -138,8 +138,6 @@ def from_collected_jsons(root_dir):
         with codecs.open(os.path.join(src_pages_dir,json_file),"w","utf8") as fo:
             json.dump(json_data,fo,indent=4,ensure_ascii=False)
 
-        # print(str(root) + "finished")
-
 """
 URLを指定してhtmlを取得し，コンテンツに関係のないタグをドロップする．
 ドロップしたhtmlと取得したテキスト文を保存．

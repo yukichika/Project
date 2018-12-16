@@ -92,8 +92,6 @@ def main(root_dir,tasks):
         with codecs.open(os.path.join(src_pages_dir,json_file),"w","utf8") as fo:
             json.dump(json_data,fo,indent=4,ensure_ascii=False)
 
-        # print(str(root) + "finished")
-
 if __name__=="__main__":
     """設定ファイルの読み込み"""
     inifile = configparser.ConfigParser(allow_no_value = True,interpolation = configparser.ExtendedInterpolation())
