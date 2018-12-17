@@ -81,7 +81,6 @@ if __name__ == "__main__":
 		with open(os.path.join(exp_dir_new,"doc2vec.pkl"),'rb') as fi:
 			doc2vec_vectors = pickle.load(fi)
 
-		# file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}
 
 		"""エッジ間の距離算出（ユークリッド距離=>コサイン類似度）"""
 		edges = G.edge
@@ -93,7 +92,7 @@ if __name__ == "__main__":
 				weight = cos_sim(p_dst,q_dst)
 				edges[node_no][link_node_no]["weight"] = weight
 
-		DEFAULT_WEIGHT = 0.5#
+		DEFAULT_WEIGHT = 0.5
 		"""全ノード間距離算出．上といろいろ重複するが面倒なのでもう一度ループ（コサイン類似度）"""
 		nodes = G.node
 		nodes_lim = len(nodes)

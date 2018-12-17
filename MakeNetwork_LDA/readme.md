@@ -10,7 +10,6 @@ matplotlib 1.5.1
 mecab-python 0.996
 numpy 1.11.3
 scipy 0.19.0
-tqdm 4.28.1
 ```
 
 ## How to Use

@@ -35,5 +35,6 @@ if __name__ == "__main__":
 	with open(ldafile,'r') as fi:
 		lda = pickle.load(fi)
 
+	print("語彙数：" + str(len(lda.vocas)))
 	for v in lda.vocas:
 		print(v)

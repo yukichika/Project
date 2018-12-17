@@ -9,13 +9,11 @@ from distutils.util import strtobool
 from tqdm import tqdm
 from gensim import models
 
+import Preprocessing
+
 import sys
 sys.path.append("../Crawler")
 import Mymodule
-sys.path.append("../../Preprocessing")
-import Sentence
-import Delete
-import Wakati
 
 """保存名の決定"""
 def suffix_generator_root(search_word,max_page,add_childs,append):
@@ -63,27 +61,22 @@ if __name__ == "__main__":
 			node_list = pickle.load(fi)
 		print("ノード数：" + str(len(node_list)))
 
-		# for node in tqdm(node_list):
-		# 	with open(os.path.join(Myexttext_raw,str(node) + ".txt"),'r') as fi:
-		# 		text = fi.read()
-		# 	sentences = Sentence.sentence(text)
-		# 	with open(os.path.join(Myexttext_pre,str(node) + ".txt"),'w') as fo:
-		# 		for sentence in sentences:
-		# 			fo.write(Delete.delete_wikipedia(sentence) + "\n")
-
 		for node in tqdm(node_list):
 			with open(os.path.join(Myexttext_raw,str(node) + ".txt"),'r') as fi:
 				text = fi.read()
-			sentences = Sentence.sentence(text)
+				text = Preprocessing.delete_pre(text)
+			sentences = Preprocessing.simple_sentence(text)
 			with open(os.path.join(Myexttext_pre,str(node) + ".txt"),'w') as fo:
-				for sentence in sentences:
-					words = Wakati.wakati(sentence).split(" ")
+				for j,sentence in enumerate(sentences):
+					words = Preprocessing.wakati(sentence).split(" ")
 					for i,word in enumerate(words):
-						word = Delete.delete_wikipedia(word)
-						if not word == "":
-							fo.write(word + " ")
-						elif i == len(words)-1:
-							fo.write("\n")
+						words[i] = Preprocessing.delete_aft(word)
+					words = [x for x in words if x]
+					text = " ".join(words)
+					if not j == len(sentences):
+						fo.write(text + " \n")
+					else:
+						fo.write(text)
 
 	"""ベクトル化"""
 	is_largest = strtobool(inifile.get('options','is_largest'))
@@ -108,14 +101,6 @@ if __name__ == "__main__":
 		vectors = {}
 		targets = os.listdir(Myexttext_pre)
 		Mymodule.sort_nicely(targets)
-
-		# for file in tqdm(targets):
-		# 	node_no = int(file.split(".")[0])
-		# 	with open(os.path.join(Myexttext_pre,file),'r') as fi:
-		# 		text = fi.read()
-		# 		words = Wakati.words_list(text)
-		# 		vector = model.infer_vector(words)
-		# 		vectors[node_no] = vector
 
 		for file in tqdm(targets):
 			node_no = int(file.split(".")[0])
