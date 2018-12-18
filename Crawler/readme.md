@@ -26,7 +26,7 @@ My_extract_content.py
 After_crawled_arrange.py  
 内部リンクと外部リンクの判定．  
 Crawler.pyでも内部・外部リンクを指定して収集しているが，収集したページのドメインを定義しなおし，再選定を行う．  
-（childs→to_int_lins&to_ext_links）  
+あくまで，収集した結果から減らしていくことしか出来ない点に注意．  
 
 ## 取得一覧（jsonファイル）  
 ```
@@ -44,6 +44,3 @@ fwdlink_time:
 to_int_links:リンク先のid（再選定後の内部リンク）
 to_ext_links:リンク先のid（再選定後の外部リンク）
 ```
-
-
-

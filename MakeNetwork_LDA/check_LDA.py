@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""学習済みのLDAインスタンスの確認用"""
+
 import cPickle as pickle
 import configparser
 import codecs

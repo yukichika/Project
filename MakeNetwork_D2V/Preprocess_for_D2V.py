@@ -81,10 +81,6 @@ if __name__ == "__main__":
 	"""ベクトル化"""
 	is_largest = strtobool(inifile.get('options','is_largest'))
 	target = inifile.get('options','target')
-	K = int(inifile.get('lda','K'))
-	exp_name = "K" + str(K) + suffix_generator(target,is_largest)
-	exp_dir = os.path.join(root_dir,exp_name)
-
 	size = int(inifile.get('lda','size'))
 	exp_name_new = "D" + str(size) + suffix_generator(target,is_largest)
 	exp_dir_new = os.path.join(root_dir,exp_name_new)

@@ -14,7 +14,7 @@ scipy 0.19.0
 ```
 
 ## How to Use
-collection_analizer2.py  
+collection_analizer.py  
 グラフを構築したデータを分析するために，エクセルに出力．  
 
 取得一覧  
