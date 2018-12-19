@@ -38,7 +38,7 @@ col_conv = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 def convert_to_excelpos(row,col):
 	return col_conv[col] + unicode(row+1)
 
-def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_dir=None,G_path=None):
+def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=None,G_path=None):
 	sheet = book.add_worksheet("collection analize")
 
 	draw_topics_flag = False
@@ -53,21 +53,12 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 		with open(os.path.join(root_dir,G_path)) as fi:
 			G = pickle.load(fi)
 
-	if "pca" in tgt_params:
+	if "pca_lda" in tgt_params:
 		theta = lda.theta()[:len(lda.docs)]
 		pca = decomposition.PCA(1)
 		pca.fit(theta)
 		theta_pca = pca.transform(theta)
 		reg_theta_pca = (theta_pca-theta_pca.min())/(theta_pca.max()-theta_pca.min())#0~1に正規化
-		cmap = cm.jet_r
-		# cmap = cm.jet
-
-	if "pca_d2v" in tgt_params:
-		vecs = [d2v[x] for x in d2v.keys()]
-		pca = decomposition.PCA(1)
-		pca.fit(vecs)
-		vecs_pca = pca.transform(vecs)
-		reg_vecs_pca = (vecs_pca-vecs_pca.min())/(vecs_pca.max()-vecs_pca.min())#0~1に正規化
 		cmap = cm.jet_r
 		# cmap = cm.jet
 
@@ -134,17 +125,11 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 			elif param == "pie":
 				sheet.insert_image(tgt_row,i,os.path.join(pie_dir,unicode(lda.file_id_dict[id])+".png"))
 				continue
-			elif param == "pca":
+			elif param == "pca_lda":
 				val = float(reg_theta_pca[id])
 				c_format = book.add_format()
 				#c_format.set_pattern(1)
 				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
-			elif param == "pca_d2v":
-				val = float(reg_vecs_pca[id])
-				c_format = book.add_format()
-				#c_format.set_pattern(1)
-				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
-
 			else:
 				val = node.get(param)
 
@@ -153,9 +138,9 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 			if draw_topics_flag == True:
 				for i in range(lda.K):
 					sheet.write(tgt_row,last_col+i+1,theta[id,i])
-				# sheet.add_sparkline(convert_to_excelpos(tgt_row,last_col), {'range':convert_to_excelpos(tgt_row,last_col+1)+":"+convert_to_excelpos(tgt_row,last_col+1+lda.K),
-				# 							               'type': 'column',
-				# 							               'style': 12})
+				sheet.add_sparkline(convert_to_excelpos(tgt_row,last_col), {'range':convert_to_excelpos(tgt_row,last_col+1)+":"+convert_to_excelpos(tgt_row,last_col+1+lda.K),
+											               'type': 'column',
+											               'style': 12})
 
 def create_topic_words(book,lda,top_n=20,word_only=False):
 	sheet = book.add_worksheet("topics")
@@ -183,7 +168,7 @@ def create_topic_words(book,lda,top_n=20,word_only=False):
 				sheet.write(i,word_col,unicode(lda.vocas[w]))
 				sheet.write(i,prob_col,phi[k,w],c_format)
 
-def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
+def main(root_dir,expname,tgt_params,G_name=None,**kwargs):
 	"""関連フォルダの存在確認"""
 	if not os.path.exists(root_dir):
 		print "root_dir",root_dir,"is not exist"
@@ -192,11 +177,6 @@ def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
 	exp_dir = os.path.join(root_dir,expname)
 	if not os.path.exists(exp_dir):
 		print "exp_dir",exp_dir,"is not exist"
-		exit()
-
-	new_exp_dir = os.path.join(root_dir,newexpname)
-	if not os.path.exists(exp_dir):
-		print "new_exp_dir",new_exp_dir,"is not exist"
 		exit()
 
 	src_pages_dir = os.path.join(root_dir,"Pages")
@@ -226,13 +206,11 @@ def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
 	"""ファイルの読み込み"""
 	with open(os.path.join(exp_dir,"instance.pkl")) as fi:
 	   lda = pickle.load(fi)
-	with open(os.path.join(new_exp_dir,"doc2vec.pkl")) as fi:
-	   d2v = pickle.load(fi)
 
 	##book=xlwt.Workbook()
-	book = xlsxwriter.Workbook(os.path.join(root_dir,save_name))
+	book = xlsxwriter.Workbook(os.path.join(exp_dir,save_name))
 	"""Webページの情報"""
-	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_dir=pie_dir,G_path=G_path)
+	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=pie_dir,G_path=G_path)
 	"""トピック毎の単語分布"""
 	create_topic_words(book,lda,top_n=top_n,word_only=True)
 	book.close()
@@ -273,10 +251,8 @@ if __name__=="__main__":
 	target = inifile.get('options','target')
 	K = int(inifile.get('lda','K'))
 	exp_name = "K" + unicode(K) + suffix_generator(target,is_largest)
-	size = int(inifile.get('lda','size'))
-	new_exp_name = "D" + unicode(size) + suffix_generator(target,is_largest)
 
-	save_name = "collection_datas.xlsx"
+	save_name = "collection_datas_lda.xlsx"
 	top_n = 20
 
 	tgt_params = [
@@ -293,8 +269,7 @@ if __name__=="__main__":
 		"repTopic",#代表トピック
 		"hits",#HITSスコア
 		"topics",#
-		"pca",#LDAの主成分分析
-		"pca_d2v"#D2Vの主成分分析
+		"pca_lda"#LDAの主成分分析
 		]
 
-	main(root_dir=root_dir,expname=exp_name,newexpname=new_exp_name,tgt_params=tgt_params,save_name=save_name,top_n=top_n)
+	main(root_dir=root_dir,expname=exp_name,tgt_params=tgt_params,save_name=save_name,top_n=top_n)

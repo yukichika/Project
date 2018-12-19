@@ -358,9 +358,9 @@ def main(_params):
 		print "exp_dir",exp_dir,"is not exist"
 		exit()
 
-	nx_process_dir = os.path.join(nx_dir,"process")
-	if not os.path.exists(nx_process_dir):
-		os.mkdir(nx_process_dir)
+	# nx_process_dir = os.path.join(nx_dir,"process")
+	# if not os.path.exists(nx_process_dir):
+	# 	os.mkdir(nx_process_dir)
 
 	"""データの読み込み"""
 	with open(os.path.join(nx_dir,src_pkl_name),"r") as fi:

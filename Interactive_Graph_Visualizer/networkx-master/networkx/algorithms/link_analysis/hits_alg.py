@@ -93,17 +93,20 @@ def hits(G,max_iter=100,tol=1.0e-8,nstart=None,normalized=True,weight_key="weigh
 		a=dict.fromkeys(hlast.keys(),0)
 		# this "matrix multiply" looks odd because it is
 		# doing a left multiply a^T=hlast^T*G
+		"""オーソリティスコア"""
 		#nはリンク元、nbrはリンク先
 		#オーソリティスコアはリンクされているページのハブスコアの合計（エッジ間の重みも考慮できる）
 		for n in h:
 			for nbr in G[n]:
 				a[nbr]+=hlast[n]*G[n][nbr].get(weight_key,1)
 		# now multiply h=Ga
+		"""ハブスコア"""
 		#nはリンク元、nbrはリンク先
 		#ハブスコアはリンクしているページのオーソリティスコアの合計（エッジ間の重みも考慮できる）
 		for n in h:
 			for nbr in G[n]:
 				h[n]+=a[nbr]*G[n][nbr].get(weight_key,1)
+
 		# normalize vector
 		s=1.0/max(h.values())#ハブスコアの最大値
 		for n in h: h[n]*=s
@@ -184,7 +187,7 @@ def bhits(G,max_iter=100,tol=1.0e-8,nstart=None,normalized=True,weight_key="weig
 	.. [2] Jon Kleinberg,
 	   Authoritative sources in a hyperlinked environment
 	   Journal of the ACM 46 (5): 604-32, 1999.
-	   doi:10.1145/324133.324140.
+	   doi:10.1145/324133.324140.a[nbr]+=hlast[n]*G[n][nbr].get(weight_key,1)/denom
 	   http://www.cs.cornell.edu/home/kleinber/auth.pdf.
 	"""
 	if type(G) == nx.MultiGraph or type(G) == nx.MultiDiGraph:
@@ -208,27 +211,50 @@ def bhits(G,max_iter=100,tol=1.0e-8,nstart=None,normalized=True,weight_key="weig
 		a=dict.fromkeys(hlast.keys(),0)
 		# this "matrix multiply" looks odd because it is
 		# doing a left multiply a^T=hlast^T*G
+		"""オーソリティスコア"""
 		#nはリンク元、nbrリンク先
 		for n in h:
 			for nbr in G[n]:
-
+				"""denom=>"""
 				around_n=set(G.node[n]["from_hosts"].keys())
 				around_nbr=set(G.node[n]["from_hosts"].keys())
 				denom=1
 				for co_host in (around_n & around_nbr):
-					denom+=G.node[n]["from_hosts"][co_host]
+					denom += G.node[n]["from_hosts"][co_host]
 
 				a[nbr]+=hlast[n]*G[n][nbr].get(weight_key,1)/denom
+		# for n in h:
+		# 	for nbr in G[n]:
+		#
+		# 		around_n=set(G.node[n]["from_hosts"].keys())
+		# 		around_nbr=set(G.node[n]["from_hosts"].keys())
+		# 		denom=1
+		# 		for co_host in (around_n & around_nbr):
+		# 			denom+=G.node[n]["from_hosts"][co_host]
+		#
+		# 		a[nbr]+=hlast[n]*G[n][nbr].get(weight_key,1)/denom
 		# now multiply h=Ga
+		"""ハブスコア"""
 		for n in h:
 			for nbr in G[n]:
-				
+
 				around_n=set(G.node[n]["to_hosts"].keys())
 				around_nbr=set(G.node[n]["to_hosts"].keys())
 				denom=1
 				for co_host in (around_n & around_nbr):
 					denom+=G.node[n]["to_hosts"][co_host]
+
 				h[n]+=a[nbr]*G[n][nbr].get(weight_key,1)/denom
+		# for n in h:
+		# 	for nbr in G[n]:
+		#
+		# 		around_n=set(G.node[n]["to_hosts"].keys())
+		# 		around_nbr=set(G.node[n]["to_hosts"].keys())
+		# 		denom=1
+		# 		for co_host in (around_n & around_nbr):
+		# 			denom+=G.node[n]["to_hosts"][co_host]
+		#
+		# 		h[n]+=a[nbr]*G[n][nbr].get(weight_key,1)/denom
 		# normalize vector
 		s=1.0/max(h.values())
 		for n in h: h[n]*=s

@@ -8,7 +8,6 @@ import codecs
 from distutils.util import strtobool
 from tqdm import tqdm
 from gensim import models
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -65,12 +64,10 @@ if __name__ == "__main__":
 	file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}
 	node_list = file_id_dict_inv.keys()
 
-	random_node = random.choice(node_list)
-	p = lda.theta()[file_id_dict_inv[random_node]]
-
 	euclids = []
 	for node in node_list:
-		if not node == random_node:
+		p = lda.theta()[file_id_dict_inv[node]]
+		for node in node_list:
 			q = lda.theta()[file_id_dict_inv[node]]
 			euclids.append(compare4_2(p,q))
 
@@ -81,6 +78,5 @@ if __name__ == "__main__":
 	ax.hist(weights_array,bins=100)
 	plt.text(0.5, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
 	plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.5, 0.80, "node_no="+"{0}".format(random_node), transform=ax.transAxes)
 	fig_w.show()
 	fig_w.savefig(os.path.join(exp_dir,"check_euclid_hist.png"))

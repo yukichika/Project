@@ -20,6 +20,11 @@ import networkx as nx
 def cos_sim(v1, v2):
 	return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
 
+"""指数で正規化したユークリッド距離"""
+def compare4_2(p,q):
+	weight = np.exp(-((p-q)**2).sum())
+	return weight
+
 """保存名の決定（root_dir）"""
 def suffix_generator_root(search_word,max_page,add_childs,append):
 	suffix = "_" + search_word
@@ -63,12 +68,14 @@ if __name__ == "__main__":
 	exp_name_new = "D" + str(size) + suffix_generator(target,is_largest)
 	exp_dir_new = os.path.join(root_dir,exp_name_new)
 	nx_dir_new = os.path.join(exp_dir_new,"nx_datas")
+
 	if os.path.exists(nx_dir_new):
 		print("D2V modify finished.")
 	else:
 		os.mkdir(nx_dir_new)
 
 		weights_list = []
+		euclids = []
 
 		comp_func_name = inifile.get('nx','comp_func_name')
 		G_path = "G_with_params_" + comp_func_name + ".gpkl"
@@ -80,7 +87,6 @@ if __name__ == "__main__":
 			G = pickle.load(fi)
 		with open(os.path.join(exp_dir_new,"doc2vec.pkl"),'rb') as fi:
 			doc2vec_vectors = pickle.load(fi)
-
 
 		"""エッジ間の距離算出（ユークリッド距離=>コサイン類似度）"""
 		edges = G.edge
@@ -102,10 +108,12 @@ if __name__ == "__main__":
 			for j,j_node in enumerate(nodes):
 				q_dst = doc2vec_vectors[j_node]
 				weight = cos_sim(p_dst,q_dst)
+				weight_euclid = compare4_2(p_dst,q_dst)
 				if weight == 0:
 					weight = 0.001
 				all_node_weights[i,j] = weight
 				weights_list.append(weight)#ヒストグラム作成用
+				euclids.append(weight_euclid)#ヒストグラム作成用
 
 		"""データの書き出し"""
 		with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'w') as fo:
@@ -113,7 +121,7 @@ if __name__ == "__main__":
 		with open(os.path.join(nx_dir_new,"all_node_weights_cos_sim.gpkl"),'w') as fo:
 			pickle.dump(all_node_weights,fo)
 
-		"""weight（全ノード間の距離）のヒストグラム作成"""
+		"""weight（全ノード間の距離）のヒストグラム作成（コサイン類似度）"""
 		fig_w = plt.figure()
 		ax = fig_w.add_subplot(1,1,1)
 		weights_array = np.array(weights_list,dtype=np.float)
@@ -122,3 +130,13 @@ if __name__ == "__main__":
 		plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
 		fig_w.show()
 		fig_w.savefig(os.path.join(nx_dir_new,"cos_sim_hist.png"))
+
+		"""weight（全ノード間の距離）のヒストグラム作成（指数で正規化したユークリッド距離）"""
+		fig_w = plt.figure()
+		ax = fig_w.add_subplot(1,1,1)
+		weights_array = np.array(euclids,dtype=np.float)
+		ax.hist(weights_array,bins=100)
+		plt.text(0.5, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
+		plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
+		fig_w.show()
+		fig_w.savefig(os.path.join(nx_dir_new,"comp4_2_hist.png"))

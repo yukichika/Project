@@ -14,8 +14,8 @@ scipy 0.19.0
 ```
 
 ## How to Use
-collection_analizer.py  
-グラフを構築したデータを分析するために，エクセルに出力．  
+collection_analizer_lda.py  
+LDAにより構築したグラフデータを分析するために，エクセルに出力．  
 
 取得一覧  
 ```
@@ -30,13 +30,21 @@ len_childs:子リンク数
 to_int_links:内部リンク数
 to_ext_links:外部リンク数
 repTopic:代表トピック
-pca:LDAトピック分布の第一主成分
-pca_d2v:doc2vecベクトルの第一主成分
+pca_lda:LDAトピック分布の第一主成分
 auth_score:オーソリティスコア
 hub_score:ハブスコア
 
 <topics>
 トピック毎の単語分布
+```
+
+collection_analizer_d2v.py  
+doc2vecにより構築したグラフデータを分析するために，エクセルに出力．  
+
+取得一覧  
+```
+<collection_analizer>
+
 ```
 
 adjacent_analizer.py  
