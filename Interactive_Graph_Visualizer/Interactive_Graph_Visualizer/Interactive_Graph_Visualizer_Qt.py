@@ -472,8 +472,8 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"Test"
-	params["max_page"] = 10
+	params["search_word"] = u"iPhone"
+	params["max_page"] = 400
 	add_childs = True
 	append = False
 	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
@@ -484,16 +484,17 @@ def main(args):
 
 	params["K"] = 10
 	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
-	params["comp_func_name"] = "comp4_2"
+	# params["comp_func_name"] = "comp4_2"
+	params["comp_func_name"] = "cos_sim"
 
 	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
 	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
 	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
 
 	params["draw_option"] = {
-		"weight_type":[],
+		# "weight_type":[],
 
-		# "weight_type":["ATTR","REPUL"],
+		"weight_type":["ATTR","REPUL"],
 
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
@@ -510,17 +511,18 @@ def main(args):
 		# "weight_type":["ATTR","REPUL","BHITS"],
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
+
+		"lamb":0.5,
 
 		"node_type":"COMP1",
 		"cmap":"jet",
 		"lumine":200,
-		"color_map_by":"theta"
+		"color_map_by":"theta",
 
 		"pos_rand_path":"nest1.rand",
 		"do_rescale":True,
 		"with_label":False,
-		"lamb":0.5,
-		"add_random_move":False,
+		"add_random_move":False
 		}
 
 	app = QtGui.QApplication(args)

@@ -451,6 +451,16 @@ class AppForm(QtGui.QMainWindow):
 		#set widget
 		#self.setCentralWidget(self.main_frame)
 
+"""保存名の決定（root_dir）"""
+def suffix_generator_root(search_word,max_page,add_childs,append):
+	suffix = "_" + search_word
+	suffix += "_" + unicode(max_page)
+	if add_childs:
+		suffix += "_add_childs"
+	if append:
+		suffix += "_append"
+	return suffix
+
 """保存名の決定"""
 def suffix_generator(target=None,is_largest=False):
 	suffix = ""
@@ -464,7 +474,10 @@ def main(args):
 	params = {}
 	params["search_word"] = u"Test"
 	params["max_page"] = 10
-	params["root_dir"] = ur"/home/yukichika/ドキュメント/Data/Search_" + params["search_word"] + "_" + unicode(params["max_page"]) + "_add_childs"
+	add_childs = True
+	append = False
+	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
+	params["root_dir"] = save_dir + suffix_generator_root(params["search_word"],params["max_page"],add_childs,append)
 
 	params["is_largest"] = True
 	params["target"] = "myexttext"
@@ -481,31 +494,6 @@ def main(args):
 	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
 	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
 
-	"""
-	weight_type:["ATTR"(斥力計算に重みall_node_weightsを使う),
-	　　　　　　　　"REPUL（引力計算にエッジの重みweightを使う）",
-	　　　　　　　　"HITS"（HITSアルゴリズムを使う）,
-	　　　　　　　　"BHITS"（BHITSアルゴリズムを使う）
-				]（オーソリティかハブかはsize_attrとweight_attrで指定）
-	weight_attr:引力・斥力計算にHITSを使うか（使うならdictでオーソリティかハブか指定）
-	size_attr:ノードの大きさにHITSを使うか（使うならdictでオーソリティかハブか指定）
-	pos_rand_path:初期配置の乱数の格納ファイル．（未指定の場合は毎回乱数発生）
-	node_type:ノードの着色方法（"REPR"=>代表トピックで着色
-						   "REPR2"=>色相をPCAの1次元で，彩度をそれぞれの最大トピックの値で返す
-						   "COMP1"=>色相をPCAの1次元で，彩度をそれぞれのトピック分布の各比率で合成(composition)
-						   "PIE"=>円グラフでノード表現
-						   ）
-	do_rescale:リスケールの有無
-	with_label:ラベル付与の有無
-	lamb:引力と斥力の比率．（大きいほど斥力重視）
-	add_random_move:配置をランダムに微笑ずらすか否か
-	cmap:色の対応付け方法(カラーバー) "jet" or "lch"
-	lumine:lchを用いる場合の輝度
-	color_map_by:主成分分析の対象（"phi"=>単語分布
-							   "theta"=>トピック分布
-							   "pie"=>
-							   "None"=>無色）
-	"""
 	params["draw_option"] = {
 		"weight_type":[],
 
@@ -527,15 +515,18 @@ def main(args):
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		"pos_rand_path":"nest1.rand",
-		"node_type":"COMP1",
-		"do_rescale":True,
-		"with_label":False,
 		"lamb":0.5,
-		"add_random_move":False,
+
+		"node_type":"COMP1",
 		"cmap":"jet",
 		"lumine":200,
-		"color_map_by":"theta"
+		"color_map_by":None,
+		# "color_map_by":"theta",
+
+		"pos_rand_path":"nest1.rand",
+		"do_rescale":True,
+		"with_label":False,
+		"add_random_move":False
 		}
 
 	app = QtGui.QApplication(args)

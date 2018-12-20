@@ -358,18 +358,21 @@ def main(_params):
 		print "exp_dir",exp_dir,"is not exist"
 		exit()
 
-	nx_process_dir = os.path.join(nx_dir,"process")
-	if not os.path.exists(nx_process_dir):
-		os.mkdir(nx_process_dir)
+	# nx_process_dir = os.path.join(nx_dir,"process")
+	# if not os.path.exists(nx_process_dir):
+	# 	os.mkdir(nx_process_dir)
 
 	"""データの読み込み"""
 	with open(os.path.join(nx_dir,src_pkl_name),"r") as fi:
 		G = pickle.load(fi)
 	with open(os.path.join(nx_dir,weights_pkl_name)) as fi:
 		all_nodes_weights = pickle.load(fi)
-	with open(os.path.join(exp_dir,"instance.pkl")) as fi:
-		lda = pickle.load(fi)
+	with open(os.path.join(exp_dir,"doc2vec.pkl")) as fi:
+		d2v = pickle.load(fi)
 	print "data_loaded"
+
+	# with open(os.path.join(exp_dir,"instance.pkl")) as fi:
+	# 	lda = pickle.load(fi)
 
 	"""パラメータの読み込み"""
 	draw_option = params.get("draw_option")
@@ -441,6 +444,7 @@ def main(_params):
 			"lda":lda,
 			"draw_option":draw_option
 			}
+
 	node_collection,color_map = draw_network(G,pos,**draw_kwargs)
 	draw_option["used_color_map"] = color_map
 
@@ -608,6 +612,17 @@ def node_crawler(G,**kwargs):
 	node_collection = graph_redraw(G,_color_map=new_color_map,edgelist=edges)
 	return node_collection
 
+"""保存名の決定（root_dir）"""
+def suffix_generator_root(search_word,max_page,add_childs,append):
+	suffix = "_" + search_word
+	suffix += "_" + unicode(max_page)
+	if add_childs:
+		suffix += "_add_childs"
+	if append:
+		suffix += "_append"
+	return suffix
+
+"""保存名の決定"""
 def suffix_generator(target=None,is_largest=False):
 	suffix = ""
 	if target != None:
@@ -616,40 +631,69 @@ def suffix_generator(target=None,is_largest=False):
 		suffix += "_largest"
 	return suffix
 
-params = {}
 if __name__ == "__main__":
-	params["search_word"] = "iPhone"
+	params = {}
+	params["search_word"] = u"Test"
 	params["max_page"] = 10
-	params["root_dir"] = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs_append"
+	add_childs = True
+	append = False
+	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
+	params["root_dir"] = save_dir + suffix_generator_root(params["search_word"],params["max_page"],add_childs,append)
 
 	params["is_largest"] = True
 	params["target"] = "myexttext"
-	params["K"] = 10
-	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
 
-	params["comp_func_name"] = "comp4_2"
+	# params["K"] = 10
+	# params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
+	# params["comp_func_name"] = "comp4_2"
+
+	params["size"] = 100
+	params["exp_name"] = "D" + unicode(params["size"]) + suffix_generator(params["target"],params["is_largest"])
+	params["comp_func_name"] = "cos_sim"
+
 	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
 	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
 	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
 
-	draw_option = {
-		"weight_type":["ATTR","REPUL"],
-		#"weight_attr":{"type":"a_score","min":1,"max":3},
-		#"size_attr":{"type":"a_score","min":1000,"max":5000},
-		"pos_rand_path":"nest1.rand",
-		"node_type":"COMP1",
-		"do_rescale":True,
-		"with_label":False,
+	params["draw_option"] = {
+		"weight_type":[],
+
+		# "weight_type":["ATTR","REPUL"],
+
+		# "weight_type":["ATTR","REPUL","HITS"],
+		# "weight_attr":{"type":"a_score","min":1,"max":3},
+		# "size_attr":{"type":"a_score","min":1000,"max":5000},
+
+		# "weight_type":["ATTR","REPUL","HITS"],
+		# "weight_attr":{"type":"h_score","min":1,"max":3},
+		# "size_attr":{"type":"h_score","min":1000,"max":5000},
+
+		# "weight_type":["ATTR","REPUL","BHITS"],
+		# "weight_attr":{"type":"a_score","min":1,"max":3},
+		# "size_attr":{"type":"a_score","min":1000,"max":5000},
+
+		# "weight_type":["ATTR","REPUL","BHITS"],
+		# "weight_attr":{"type":"h_score","min":1,"max":3},
+		# "size_attr":{"type":"h_score","min":1000,"max":5000},
+
 		"lamb":0.5,
-		"add_random_move":False,
+
+		"node_type":"COMP1",
 		"cmap":"jet",
 		"lumine":200,
-		"color_map_by":"theta"
+		"color_map_by":None,
+		# "color_map_by":"theta",
+
+		"pos_rand_path":"nest1.rand",
+		"do_rescale":True,
+		"with_label":False,
+		"add_random_move":False
 		}
 
-	ax = plt.figure().add_subplot(111)
-	draw_option["ax"] = ax
-	params["draw_option"] = draw_option
 	main(params)
-	#ax.get_figure().show()
-	plt.show()
+	# ax = plt.figure().add_subplot(111)
+	# draw_option["ax"] = ax
+	# params["draw_option"] = draw_option
+	# main(params)
+	# #ax.get_figure().show()
+	# plt.show()
