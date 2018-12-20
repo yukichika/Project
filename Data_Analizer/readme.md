@@ -14,7 +14,7 @@ scipy 0.19.0
 ```
 
 ## How to Use
-collection_analizer_lda.py  
+・collection_analizer_lda.py  
 LDAにより構築したグラフデータを分析するために，エクセルに出力．  
 
 取得一覧  
@@ -38,21 +38,13 @@ hub_score:ハブスコア
 トピック毎の単語分布
 ```
 
-collection_analizer_d2v.py  
-doc2vecにより構築したグラフデータを分析するために，エクセルに出力．  
-
-取得一覧  
-```
-<collection_analizer>
-
-```
-
-adjacent_analizer.py  
+・adjacent_analizer.py  
 特定のノードに対して，隣接ノードの特性を解析．  
 リンク元・リンク先のトピック分布の割合を取得．  
 
-PCA_to_Topics.py  
+・PCA_to_Topics.py  
 PCAで次元圧縮した空間と元のトピック分布との対応づけ．  
 トピック空間での主成分ベクトルを用いてカラーマップから単語分布を逆引き．  
 
+・collection_analizer_d2v.py  
 
