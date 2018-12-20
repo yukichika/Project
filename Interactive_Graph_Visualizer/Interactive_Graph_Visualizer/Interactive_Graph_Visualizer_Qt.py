@@ -472,8 +472,8 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"iPhone"
-	params["max_page"] = 400
+	params["search_word"] = u"Test"
+	params["max_page"] = 10
 	add_childs = True
 	append = False
 	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
@@ -484,8 +484,7 @@ def main(args):
 
 	params["K"] = 10
 	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
-	# params["comp_func_name"] = "comp4_2"
-	params["comp_func_name"] = "cos_sim"
+	params["comp_func_name"] = "comp4_2"
 
 	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
 	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"

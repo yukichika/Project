@@ -482,17 +482,21 @@ def main(args):
 	params["is_largest"] = True
 	params["target"] = "myexttext"
 
-	# params["K"] = 10
-	# params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
-	# params["comp_func_name"] = "comp4_2"
+	params["K"] = 10
+	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
+	params["comp_func_name"] = "comp4_2"
 
 	params["size"] = 100
-	params["exp_name"] = "D" + unicode(params["size"]) + suffix_generator(params["target"],params["is_largest"])
-	params["comp_func_name"] = "cos_sim"
+	params["exp_name_new"] = "D" + unicode(params["size"]) + suffix_generator(params["target"],params["is_largest"])
+	params["comp_func_name_new"] = "cos_sim"
 
-	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
-	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
-	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
+	# params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
+	# params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
+	# params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
+
+	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name_new"]),"nx_datas")
+	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name_new"] + ".gpkl"
+	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name_new"] + ".gpkl"
 
 	params["draw_option"] = {
 		"weight_type":[],
@@ -520,7 +524,7 @@ def main(args):
 		"node_type":"COMP1",
 		"cmap":"jet",
 		"lumine":200,
-		"color_map_by":None,
+		"color_map_by":"vector",
 		# "color_map_by":"theta",
 
 		"pos_rand_path":"nest1.rand",

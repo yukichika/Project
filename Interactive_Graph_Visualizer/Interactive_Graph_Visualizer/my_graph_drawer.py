@@ -222,6 +222,7 @@ def draw_node_with_lch(G,pos,**kwargs):
 	node_color = color_map.values()
 	size_array = size.values()
 	node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=node_color,node_size=size_array,ax=ax,pick_func=pick_func,lamb=lamb)
+
 	return node_collection,color_map
 
 """トピック分布から色を1色決定し，lchの形で返す"""
