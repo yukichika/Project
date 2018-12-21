@@ -1,4 +1,4 @@
-# LDA
+# MakeNetwork/LDA
 
 ## Requirements
 

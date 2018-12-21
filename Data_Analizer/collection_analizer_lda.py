@@ -84,7 +84,7 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 
 		#if domain not in in_domain_titles.keys():
 		#	in_domain_titles[domain]=set()
-		for i,param in enumerate(tgt_params):
+		for j,param in enumerate(tgt_params):
 			val = 0
 			c_format = None
 			if param == "id":
@@ -123,7 +123,7 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 			elif param == "hub_score":
 				val = G.node.get(file_no).get("h_score",-1)
 			elif param == "pie":
-				sheet.insert_image(tgt_row,i,os.path.join(pie_dir,unicode(lda.file_id_dict[id])+".png"))
+				sheet.insert_image(tgt_row,j,os.path.join(pie_dir,unicode(lda.file_id_dict[id])+".png"))
 				continue
 			elif param == "pca_lda":
 				val = float(reg_theta_pca[id])
@@ -133,11 +133,11 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 			else:
 				val = node.get(param)
 
-			sheet.write(tgt_row,i,val,c_format)
+			sheet.write(tgt_row,j,val,c_format)
 
 			if draw_topics_flag == True:
-				for i in range(lda.K):
-					sheet.write(tgt_row,last_col+i+1,theta[id,i])
+				for k in range(lda.K):
+					sheet.write(tgt_row,last_col+k+1,theta[id,k])
 				sheet.add_sparkline(convert_to_excelpos(tgt_row,last_col), {'range':convert_to_excelpos(tgt_row,last_col+1)+":"+convert_to_excelpos(tgt_row,last_col+1+lda.K),
 											               'type': 'column',
 											               'style': 12})

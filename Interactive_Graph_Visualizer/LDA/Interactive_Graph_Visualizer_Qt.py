@@ -472,8 +472,8 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"Test"
-	params["max_page"] = 10
+	params["search_word"] = u"iPhone"
+	params["max_page"] = 400
 	add_childs = True
 	append = False
 	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
@@ -491,9 +491,9 @@ def main(args):
 	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
 
 	params["draw_option"] = {
-		# "weight_type":[],
+		"weight_type":[],
 
-		"weight_type":["ATTR","REPUL"],
+		# "weight_type":["ATTR","REPUL"],
 
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},

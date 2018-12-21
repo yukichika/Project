@@ -1,8 +1,9 @@
 # Interactive_Graph_Visualizer
 
 ## How to Use
-Interactive_Graph_Visualizer  
-可視化スクリプト  
+・LDA  
+
+・D2V  
 
 networkx-master  
 networkxのソース．  

@@ -3,9 +3,7 @@
 ## How to Use
 Crawler(python3)  
 
-MakeNetwork_LDA(python2)  
-
-MakeNetwork_D2V(python3 & python2)  
+MakeNetwork(python2&python3)  
 
 Data_Analizer(python2)  
 

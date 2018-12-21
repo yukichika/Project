@@ -53,7 +53,7 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 		with open(os.path.join(root_dir,G_path)) as fi:
 			G = pickle.load(fi)
 
-	if "pca" in tgt_params:
+	if "pca_lda" in tgt_params:
 		theta = lda.theta()[:len(lda.docs)]
 		pca = decomposition.PCA(1)
 		pca.fit(theta)
@@ -93,7 +93,7 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 
 		#if domain not in in_domain_titles.keys():
 		#	in_domain_titles[domain]=set()
-		for i,param in enumerate(tgt_params):
+		for j,param in enumerate(tgt_params):
 			val = 0
 			c_format = None
 			if param == "id":
@@ -132,15 +132,15 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 			elif param == "hub_score":
 				val = G.node.get(file_no).get("h_score",-1)
 			elif param == "pie":
-				sheet.insert_image(tgt_row,i,os.path.join(pie_dir,unicode(lda.file_id_dict[id])+".png"))
+				sheet.insert_image(tgt_row,j,os.path.join(pie_dir,unicode(lda.file_id_dict[id])+".png"))
 				continue
-			elif param == "pca":
+			elif param == "pca_lda":
 				val = float(reg_theta_pca[id])
 				c_format = book.add_format()
 				#c_format.set_pattern(1)
 				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
 			elif param == "pca_d2v":
-				val = float(reg_vecs_pca[id])
+				val = float(reg_vecs_pca[i])
 				c_format = book.add_format()
 				#c_format.set_pattern(1)
 				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
@@ -148,11 +148,11 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 			else:
 				val = node.get(param)
 
-			sheet.write(tgt_row,i,val,c_format)
+			sheet.write(tgt_row,j,val,c_format)
 
 			if draw_topics_flag == True:
-				for i in range(lda.K):
-					sheet.write(tgt_row,last_col+i+1,theta[id,i])
+				for k in range(lda.K):
+					sheet.write(tgt_row,last_col+k+1,theta[id,k])
 				# sheet.add_sparkline(convert_to_excelpos(tgt_row,last_col), {'range':convert_to_excelpos(tgt_row,last_col+1)+":"+convert_to_excelpos(tgt_row,last_col+1+lda.K),
 				# 							               'type': 'column',
 				# 							               'style': 12})
@@ -293,7 +293,7 @@ if __name__=="__main__":
 		"repTopic",#代表トピック
 		"hits",#HITSスコア
 		"topics",#
-		"pca",#LDAの主成分分析
+		"pca_lda",#LDAの主成分分析
 		"pca_d2v"#D2Vの主成分分析
 		]
 
