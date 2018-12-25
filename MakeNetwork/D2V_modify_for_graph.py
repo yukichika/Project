@@ -11,9 +11,9 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.append("../../MyPythonModule")
+sys.path.append("../MyPythonModule")
 import mymodule
-sys.path.append("../../Interactive_Graph_Visualizer/networkx-master")
+sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
 import networkx as nx
 
 """コサイン類似度"""
@@ -47,7 +47,7 @@ def suffix_generator(target=None,is_largest=False):
 if __name__ == "__main__":
 	"""設定ファイルの読み込み"""
 	inifile = configparser.ConfigParser(allow_no_value = True,interpolation = configparser.ExtendedInterpolation())
-	inifile.readfp(codecs.open("./D2V.ini",'r','utf8'))
+	inifile.readfp(codecs.open("./series_act.ini",'r','utf8'))
 
 	"""検索パラメータの設定"""
 	search_word = inifile.get('options','search_word')
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 	exp_dir = os.path.join(root_dir,exp_name)
 	nx_dir = os.path.join(exp_dir,"nx_datas")
 
-	size = int(inifile.get('lda','size'))
+	size = int(inifile.get('d2v','size'))
 	exp_name_new = "D" + str(size) + suffix_generator(target,is_largest)
 	exp_dir_new = os.path.join(root_dir,exp_name_new)
 	nx_dir_new = os.path.join(exp_dir_new,"nx_datas")

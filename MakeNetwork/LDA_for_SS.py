@@ -14,7 +14,7 @@ import codecs
 from tqdm import tqdm
 
 import sys
-sys.path.append("../../MyPythonModule")
+sys.path.append("../MyPythonModule")
 import mymodule
 from LDA_kai import LDA
 
@@ -234,16 +234,3 @@ def main(root_dir,K,iteration,smartinit,no_below=5,no_above=0.5,no_less=1,alpha=
 	#	with open(os.path.join(exp_dir,"instance.pkl"), 'r') as fs:
 	#		lda=pickle.load(fs)
 	#	print "M=%d, V=%d, K=%d" % (len(lda.docs), len(lda.vocas), K)
-
-if __name__=="__main__":
-	search_word = "iPhone"
-	max_page = 10
-	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs"
-
-	# file_id_list = []
-	# if is_largest == True:
-	# 	with open(os.path.join(root_dir,"file_id_list.list")) as fi:
-	# 	   file_id_list = pickle.load(fi)
-
-	# make_chasens(root_dir,target_list=file_id_list)
-	# main(root_dir=root_dir,K=K,iteration=iteration,smartinit=True,no_below=no_below,no_above=no_above,alpha=alpha,beta=beta,target_list=file_id_list)

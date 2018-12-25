@@ -12,7 +12,7 @@ from gensim import models
 import Preprocessing
 
 import sys
-sys.path.append("../../Crawler")
+sys.path.append("../Crawler")
 import Mymodule
 
 """保存名の決定"""
@@ -37,7 +37,7 @@ def suffix_generator(target=None,is_largest=False):
 if __name__ == "__main__":
 	"""設定ファイルの読み込み"""
 	inifile = configparser.ConfigParser(allow_no_value = True,interpolation = configparser.ExtendedInterpolation())
-	inifile.readfp(codecs.open("./D2V.ini",'r','utf8'))
+	inifile.readfp(codecs.open("./series_act.ini",'r','utf8'))
 
 	"""検索パラメータの設定"""
 	search_word = inifile.get('options','search_word')
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 	"""ベクトル化"""
 	is_largest = strtobool(inifile.get('options','is_largest'))
 	target = inifile.get('options','target')
-	size = int(inifile.get('lda','size'))
+	size = int(inifile.get('d2v','size'))
 	exp_name_new = "D" + str(size) + suffix_generator(target,is_largest)
 	exp_dir_new = os.path.join(root_dir,exp_name_new)
 

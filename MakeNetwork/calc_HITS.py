@@ -3,11 +3,14 @@
 
 import os
 import cPickle as pickle
+import configparser
+import codecs
+from distutils.util import strtobool
 
 import cvt_to_nxtype2
 
 import sys
-sys.path.append("../../Interactive_Graph_Visualizer/networkx-master")
+sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
 import networkx as nx
 
 def status_writer(dst_dir,opt,comment=None):
@@ -111,6 +114,17 @@ def main(search_word,src_pkl_name,exp_name,root_dir,weight_key="weight",use_bhit
 	with open(os.path.join(nx_dir,src_pkl_name),"w") as fo:
 		pickle.dump(G,fo)
 
+"""保存名の決定（root_dir）"""
+def suffix_generator_root(search_word,max_page,add_childs,append):
+	suffix = "_" + search_word
+	suffix += "_" + unicode(max_page)
+	if add_childs:
+		suffix += "_add_childs"
+	if append:
+		suffix += "_append"
+	return suffix
+
+"""保存名の決定"""
 def suffix_generator(target=None,is_largest=False):
 	suffix = ""
 	if target != None:
@@ -120,22 +134,29 @@ def suffix_generator(target=None,is_largest=False):
 	return suffix
 
 if __name__ == "__main__":
-	"""収集したリンク情報をnx形式に変換"""
-	search_word = "iPhone"
-	max_page = 4
-	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs"
+	"""設定ファイルの読み込み"""
+	inifile = configparser.ConfigParser(allow_no_value = True,interpolation = configparser.ExtendedInterpolation())
+	inifile.readfp(codecs.open("./series_act.ini",'r','utf8'))
 
-	is_largest = True#リンクから構築したグラフのうち，最大サイズのモノのみを使う場合True
-	target = "myexttext"#対象とするwebページの抽出方法を指定
+	"""検索パラメータの設定"""
+	search_word = inifile.get('options','search_word')
+	max_page = int(inifile.get('options','max_page'))
+	add_childs = strtobool(inifile.get('options','add_childs'))
+	append = strtobool(inifile.get('options','append'))
+	save_dir = inifile.get('other_settings','save_dir')
+	root_dir = save_dir + suffix_generator_root(search_word,max_page,add_childs,append)
+
+	is_largest = strtobool(inifile.get('options','is_largest'))
+	target = inifile.get('options','target')
 	G_name = "G" + suffix_generator(target=target,is_largest=is_largest)
 
-	comp_func_name = "comp4_2"
-	K = 10
+	comp_func_name = inifile.get('nx','comp_func_name')
+	K = int(inifile.get('lda','K'))
 	exp_name = "K" + unicode(K) + suffix_generator(target=target,is_largest=is_largest)
 	src_pkl_name = "G_with_params_" + comp_func_name + ".gpkl"
-	weight_key = "no_weight"
-	use_bhits = False
+	weight_key = inifile.get('hits','weight_key')
+	use_bhits = strtobool(inifile.get('hits','use_bhits'))
 
-	#main(search_word,src_pkl_name,exp_name,root_dir,weight_key=weight_key,use_bhits=use_bhits)
+	main(search_word,src_pkl_name,exp_name,root_dir,weight_key=weight_key,use_bhits=use_bhits)
 	#use_to_link="childs"
 	#calc_hits_from_redefined_G(search_word,src_pkl_name,exp_name,root_dir,use_to_link=use_to_link)

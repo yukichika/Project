@@ -13,9 +13,9 @@ import cPickle as pickle
 from collections import Counter
 
 import sys
-sys.path.append("../../MyPythonModule")
+sys.path.append("../MyPythonModule")
 import mymodule
-sys.path.append("../../Interactive_Graph_Visualizer/networkx-master")
+sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
 
 """
 urlからドメイン部分を抽出して返す．
@@ -103,30 +103,3 @@ def del_keys(params):
 		G[node].pop("from_hosts")
 	with open(src_gpkl_path,"w") as fo:
 		pickle.dump(G,fo)
-
-def suffix_generator(target=None,is_largest=False):
-	suffix = ""
-	if target != None:
-		suffix += "_" + target
-	if is_largest == True:
-		suffix += "_largest"
-	return suffix
-
-if __name__=="__main__":
-	params = {}
-	params["search_word"] = u"iPhone"
-	params["max_page"] = 4
-	params["root_dir"] = ur"/home/yukichika/ドキュメント/Data/Search_" + params["search_word"] + "_" + unicode(params["max_page"]) + "_add_childs"
-
-	params["is_largest"] = True
-	params["target"] = "myexttext"
-	params["K"] = 10
-	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
-
-	params["comp_func_name"] = "comp4_2"
-	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
-	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
-	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
-
-	# main(params)
-	#del_keys(params)

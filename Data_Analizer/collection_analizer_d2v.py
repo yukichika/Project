@@ -273,7 +273,7 @@ if __name__=="__main__":
 	target = inifile.get('options','target')
 	K = int(inifile.get('lda','K'))
 	exp_name = "K" + unicode(K) + suffix_generator(target,is_largest)
-	size = int(inifile.get('lda','size'))
+	size = int(inifile.get('d2v','size'))
 	new_exp_name = "D" + unicode(size) + suffix_generator(target,is_largest)
 
 	save_name = "collection_datas_d2v.xlsx"

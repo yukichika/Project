@@ -129,4 +129,8 @@ if __name__ == "__main__":
 	weight_key = inifile.get('hits','weight_key')
 	use_bhits = strtobool(inifile.get('hits','use_bhits'))
 	print("-----HITSの計算-----")
+	if use_bhits:
+		print("BHITS")
+	else:
+		print("HITS")
 	calc_HITS.main(search_word,src_pkl_name,exp_name,root_dir,weight_key=weight_key,use_bhits=use_bhits)

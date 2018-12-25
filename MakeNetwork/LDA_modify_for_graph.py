@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 import sys
-sys.path.append("../../Interactive_Graph_Visualizer/networkx-master")
+sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
 import networkx as nx
 
 COLORLIST_R = [r"#EB6100",r"#F39800",r"#FCC800",r"#FFF100",r"#CFDB00",r"#8FC31F",r"#22AC38",r"#009944",r"#009B6B",r"#009E96",r"#00A0C1",r"#00A0E9",r"#0086D1",r"#0068B7",r"#00479D",r"#1D2088",r"#601986",r"#920783",r"#BE0081",r"#E4007F",r"#E5006A",r"#E5004F",r"#E60033"]
@@ -309,8 +309,3 @@ def main(root_dir,exp_name,comp_func_name="comp4_2",G_name="G",void_node_remove=
 	plt.axis("off")
 	plt.axis('equal')
 	plt.savefig(os.path.join(exp_dir,"Topic"+unicode(lda.K)+"_share_pie.png"))
-
-if __name__ == "__main__":
-	search_word = "iPhone"
-	max_page = 10
-	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs_append"

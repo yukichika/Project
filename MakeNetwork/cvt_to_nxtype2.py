@@ -15,9 +15,9 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 import sys
-sys.path.append("../../MyPythonModule")
+sys.path.append("../MyPythonModule")
 import mymodule
-sys.path.append("../../Interactive_Graph_Visualizer/networkx-master")
+sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
 import networkx as nx
 
 """
@@ -150,12 +150,3 @@ def main(root_dir,sel_largest=True,G_name="G",rem_selfloop=True,use_to_link="chi
 	print "新ノード数：" + str(new_node_num)
 
 	# check_network(root_dir,pkl_name=G_name+".gpkl")
-
-if __name__ == "__main__":
-	search_word = "iPhone"
-	max_page = 10
-	root_dir = ur"/home/yukichika/ドキュメント/Data/Search_" + search_word + "_" + unicode(max_page) + "_add_childs"
-	sel_largest = True
-	G_name = "G_myexttext_largest"
-
-	# main(root_dir=root_dir,sel_largest=sel_largest,G_name=G_name)
