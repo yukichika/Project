@@ -28,7 +28,8 @@ Webページの収集と，リンク先の取得．（検索パラメータは設定ファイルで指定）
 Crawler.pyでも内部・外部リンクを指定して収集しているが，収集したページのドメインを定義しなおし，再選定を行う．  
 あくまで，収集した結果から減らしていくことしか出来ない点に注意．  
 
-## 取得一覧（jsonファイル）  
+## 取得一覧
+・Pages（jsonファイル） 
 ```
 url:取得ページのURL
 title:取得ページのタイトル
@@ -38,9 +39,21 @@ html:取得ページのhtml
 getpage_time:ページの取得に要する時間
 langdetect_time:テキストのチェックに要する時間
 id:取得ページのid
-childs:リンク先のid（外部リンク・内部リンクは指定）
-fwdlink_time:
+childs:リンク先のid（外部リンク・内部リンクは指定済み）
+fwdlink_time:内部リンク・外部リンクの選定に要する時間
 ｍｙexttext:取得ページのテキスト文（My_extract_content.pyのstrip_tagsにより取得）
 to_int_links:リンク先のid（再選定後の内部リンク）
 to_ext_links:リンク先のid（再選定後の外部リンク）
 ```
+
+・url_id_dict.pkl  
+取得したWebページのurlがキー，idが要素の辞書  
+
+・Collect_options.txt  
+検索条件  
+
+・Myexttext_html（txtファイル）  
+取得したWebページのテキスト文  
+
+・Dropped_html（html）  
+取得したWebページのhtml  
