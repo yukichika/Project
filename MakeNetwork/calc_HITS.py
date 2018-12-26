@@ -150,10 +150,18 @@ if __name__ == "__main__":
 	target = inifile.get('options','target')
 	G_name = "G" + suffix_generator(target=target,is_largest=is_largest)
 
-	comp_func_name = inifile.get('nx','comp_func_name')
-	K = int(inifile.get('lda','K'))
-	exp_name = "K" + unicode(K) + suffix_generator(target=target,is_largest=is_largest)
+	flag = inifile.get('hits','flag')
+	if flag == "lda":
+		comp_func_name = inifile.get('nx','comp_func_name')
+		K = int(inifile.get('lda','K'))
+		exp_name = "K" + unicode(K) + suffix_generator(target=target,is_largest=is_largest)
+	elif flag == "d2v":
+		comp_func_name = "cos_sim"
+		D = int(inifile.get('d2v','size'))
+		exp_name = "D" + unicode(D) + suffix_generator(target=target,is_largest=is_largest)
+
 	src_pkl_name = "G_with_params_" + comp_func_name + ".gpkl"
+
 	weight_key = inifile.get('hits','weight_key')
 	use_bhits = strtobool(inifile.get('hits','use_bhits'))
 

@@ -1,4 +1,4 @@
-# Interactive_Graph_Visualizer/LDA
+# Interactive_Graph_Visualizer
 
 ## Requirements
 

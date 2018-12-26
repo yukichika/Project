@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 """
 やりたいこと
 UI付きのグラフ可視化．
@@ -25,8 +26,8 @@ from math import modf#整数と小数の分離
 import matplotlib.font_manager
 import cv2
 from sklearn import decomposition
-#import json
-#import codecs
+import json
+import codecs
 
 import color_changer
 import LDA_PCA
@@ -41,14 +42,9 @@ import networkx as nx
 
 prop = matplotlib.font_manager.FontProperties(fname='/usr/share/fonts/truetype/meiryo/meiryo.ttc')#pyplotに日本語を使うために必要
 
-COLORLIST_R = [r"#EB6100",r"#F39800",r"#FCC800",r"#FFF100",r"#CFDB00",r"#8FC31F",r"#22AC38",r"#009944",r"#009B6B",r"#009E96",r"#00A0C1",r"#00A0E9",r"#0086D1",r"#0068B7",r"#00479D",r"#1D2088",r"#601986",r"#920783",r"#BE0081",r"#E4007F",r"#E5006A",r"#E5004F",r"#E60033"]
-COLORLIST = [c for c in COLORLIST_R[::2]]#色のステップ調整
-
-"""指定した条件を持つノード以外を除去"""
-def reserve_nodes(G,param,value):
-	for a, d in G.nodes(data=True):
-		if d.get(param) not in value:
-			G.remove_node(a)
+"""オプションを読みやすい形式で保存.前処理をしてから渡す"""
+def save_drawoption(param_dict,path):
+	mymodule.save_option(param_dict,path)
 
 """pathの位置に乱数があればそれを，無ければ新たに作る"""
 def pos_initializer(G,path):
@@ -57,7 +53,6 @@ def pos_initializer(G,path):
 		with open(path) as fi:
 			pos = pickle.load(fi)
 		return pos
-
 	#pathが存在しない場合
 	pos = dict()
 	for a, d in G.nodes(data=True):
@@ -65,203 +60,6 @@ def pos_initializer(G,path):
 	with open(path,"w") as fo:
 		pickle.dump(pos,fo)
 	return pos
-
-def draw_node_with_pie(G,pos,lda,size):
-	theta = lda.theta()
-	file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}#ファイル名とLDAでの文書番号(逆引き)．LDAの方に作っとけばよかった．．．
-	for serial_no,node_no in enumerate(G.node.keys()):
-		draw_pos = pos[node_no]
-		node_size = size[node_no]
-		lda_no = file_id_dict_inv.get(node_no)
-		if lda_no == None:
-			pass
-		else:
-			theta_d = theta[lda_no]
-			plt.pie(theta_d,colors=COLORLIST[:lda.K],startangle=90,radius=node_size, center=draw_pos, frame=False,counterclock=False)
-
-def cvtRGB_to_HTML(RGB_1channel):
-	R,G,B = RGB_1channel
-	R_str = unicode("%02x"%R)
-	G_str = unicode("%02x"%G)
-	B_str = unicode("%02x"%B)
-	return u"#"+R_str+G_str+B_str
-
-def cvtLCH_to_HTML(LCH_1channel):
-	lch_img = np.ones((2,2,3),dtype=np.float32)*LCH_1channel
-	BGR_img = color_changer.cvtLCH2BGR(lch_img)
-	RGB_img = cv2.cvtColor(BGR_img,cv2.COLOR_BGR2RGB)
-	RGB_1channel = RGB_img[0,0]
-	return cvtRGB_to_HTML(RGB_1channel)
-
-"""1次元へのPCAをベースとして色変換を行う関数分岐"""
-def get_color_map_phi(G,pos,lda,comp_type="COMP1",lumine=255):
-	theta = lda.theta()[:len(lda.docs)]
-	phi = lda.phi()
-	psi_fake = lda.phi()*(lda.theta().sum(axis=0)[np.newaxis].T)
-	phi = psi_fake
-
-	#phi = (np.zeros_like(phi)+1)*(lda.theta().sum(axis=0)[np.newaxis].T)
-
-	pca = decomposition.PCA(1)
-	pca.fit(phi)
-	phi_pca = pca.transform(phi)
-	reg_phi_pca = (phi_pca-phi_pca.min())/(phi_pca.max()-phi_pca.min())#0~1に正規化
-	h_values = (reg_phi_pca*np.pi).T[0]#列ヴェクトルとして与えられるため，1行に変換
-	#LDA_PCA.topic_color_manager_1d(h_values,lda,lumine)#色変換の図を表示
-	make_lch_picker.draw_half(h_values,lumine=lumine,with_label=False)#色変換の図を表示
-
-	file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}#ファイル名とLDAでの文書番号(逆引き)．LDAの方に作っとけばよかった．．．
-	color_map = {}
-	for serial_no,node_no in enumerate(G.node.keys()):
-		lda_no = file_id_dict_inv.get(node_no)
-		if lda_no == None:
-			color_map[node_no] = r"#FFFFFF"
-			continue
-		theta_d = theta[lda_no]
-		lch = theta_to_lch(theta_d,h_values,comp_type=comp_type,l=lumine)
-		html_color = cvtLCH_to_HTML(lch)
-		color_map[node_no] = html_color
-
-	return color_map
-
-def circler_color_converter(values,start_angle):
-	values = values+start_angle*np.pi
-	np.where(values<2*np.pi,values,values-2*np.pi)
-	return values
-
-def cvtRGBAflt2HTML(rgba):
-	rgb = rgba[0][:3]
-	rgb_uint = (rgb*255).astype(np.uint8)
-	return LDA_PCA.cvtRGB_to_HTML(rgb_uint)
-
-reg_theta_pca = 0
-def get_color_map_theta(G,pos,lda,comp_type="COMP1",lumine=255,cmap="lch"):
-	global reg_theta_pca
-	"""thetaの方を主成分分析で1次元にして彩色"""
-	theta = lda.theta()[:len(lda.docs)]
-
-	pca = decomposition.PCA(1)
-	pca.fit(theta)
-	theta_pca = pca.transform(theta)
-	reg_theta_pca = (theta_pca-theta_pca.min())/(theta_pca.max()-theta_pca.min())#0~1に正規化
-	h_values = circler_color_converter(reg_theta_pca*2*np.pi,0.2).T[0]#列ヴェクトルとして与えられるため，1行に変換
-	make_lch_picker.draw_color_hist(h_values,resolution=50,lumine=lumine,color_map=cmap)#色変換の図を表示
-
-	"""寄与率計算のため，再度PCA"""
-	pca2 = decomposition.PCA(lda.K)
-	pca2.fit(theta)
-	print pca2.explained_variance_ratio_
-
-	if cmap == "lch":
-		c_flt = 1.0
-		file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}#ファイル名とLDAでの文書番号(逆引き)．LDAの方に作っとけばよかった．．．
-		color_map = {}
-		for serial_no,node_no in enumerate(G.node.keys()):
-			lda_no = file_id_dict_inv.get(node_no)
-			if lda_no == None:
-				color_map[node_no] = r"#FFFFFF"
-				continue
-			h_value = h_values[lda_no]
-			lch = np.array((lumine,c_flt,h_value),dtype=np.float32)
-			html_color = cvtLCH_to_HTML(lch)
-			color_map[node_no] = html_color
-
-	elif cmap == "jet":
-		# c_map = cm.jet
-		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
-		file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}#ファイル名とLDAでの文書番号(逆引き)．LDAの方に作っとけばよかった．．．
-		color_map = {}
-		for serial_no,node_no in enumerate(G.node.keys()):
-			lda_no = file_id_dict_inv.get(node_no)
-			if lda_no == None:
-				color_map[node_no] = r"#FFFFFF"
-				continue
-			color_map[node_no] = cvtRGBAflt2HTML(c_map(reg_theta_pca[lda_no]))
-
-	return color_map
-
-"""色相をPCAの1次元で，彩度をそれぞれのトピック分布の各比率で合成(composition)"""
-def draw_node_with_lch(G,pos,**kwargs):
-	lda = kwargs.get("lda")
-	size = kwargs.get("size")
-	draw_option = kwargs.get("draw_option")
-	color_map_by = draw_option.get("color_map_by")
-	comp_type = draw_option.get("comp_type")
-	lumine = draw_option.get("lumine")
-	cmap = draw_option.get("cmap")
-	ax = draw_option.get("ax")
-	pick_func = draw_option.get("pick_func")
-	lamb = draw_option.get("lamb")
-
-	if color_map_by == "phi":
-		color_map = get_color_map_phi(G,pos,lda,comp_type,lumine=lumine)
-	elif color_map_by == "theta":
-		color_map = get_color_map_theta(G,pos,lda,comp_type,lumine=lumine,cmap=cmap)
-	elif color_map_by == None:
-		color_map = dict.fromkeys(G,"#FFFFFF")
-
-	node_color = color_map.values()
-	size_array = size.values()
-	node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=node_color,node_size=size_array,ax=ax,pick_func=pick_func,lamb=lamb)
-
-	return node_collection,color_map
-
-"""トピック分布から色を1色決定し，lchの形で返す"""
-def theta_to_lch(theta_d,h_values,comp_type="COMP1",l=100):
-	if comp_type == "REPR2":#色相をPCAの1次元で，彩度をそれぞれの最大トピックの値で返す
-		c = theta_d.max()
-		rep_topic = theta_d.argmax()
-		h = h_values[rep_topic]
-		lch = np.array((l,c,h),dtype=np.float32)
-	elif comp_type == "COMP1":#色相をPCAの1次元で，彩度をそれぞれのトピック分布の各比率で合成(composition)
-		orth_vals = np.array([color_changer.cvt_polar_to_orth(theta_t,h_values[k]) for k,theta_t in enumerate(theta_d)],dtype=np.float32)
-		orth_vals = orth_vals.sum(axis=0)
-		c_flt = np.sqrt(orth_vals[0]**2+orth_vals[1]**2)
-		h_flt = np.arctan2(orth_vals[1],orth_vals[0])
-		lch = np.array((l,c_flt,h_flt),dtype=np.float32)
-
-	return lch
-
-"""消えてしまった軸を復活させる(たい)．大仰なやり方なうえ不十分だが一応見るに堪える形式"""
-def draw_axis(xstep,ystep=None):
-	if(ystep == None):
-		ystep = xstep
-	xmin,xmax,ymin,ymax = plt.axis()
-	xmin = modf(xmin/xstep)[1]*xstep
-	ymin = modf(ymin/ystep)[1]*ystep
-	plt.xticks(np.arange(xmin,xmax,ystep))#なぜか座標軸が消えるので補完
-	plt.yticks(np.arange(ymin,ymax,xstep))#なぜか座標軸が消えるので補完
-
-"""ノードおよびエッジを描画する．オプションによって動作指定"""
-def draw_network(G,pos,**kwargs):
-	size = kwargs.get("size")
-	lda = kwargs.get("lda")
-	draw_option = kwargs.get("draw_option")
-	node_type = draw_option.get("node_type")
-	ax = draw_option.get("ax")
-	#with_label = draw_option.get("with_label")
-
-	color_map = None
-	if node_type == "REPR":
-		color_map = nx.get_node_attributes(G,"color")
-		size_array = size.values()
-		#nx.draw(G,pos=pos,with_labels=True)#with_labelsは各ノードのラベル表示.この関数事体を呼ばずに下二つを呼ぶと軸ラベルがつく．内部的にはいろいろ処理した後下二つを呼んでる
-		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax);
-		#nx.draw_networkx_edges(G,pos,font_size=int(12*100/dpi))
-	elif node_type == "PIE":
-		draw_node_with_pie(G,pos,lda,size)
-		#draw_axis(xstep=0.2,ystep=0.2)#なぜか上処理で軸が消えてしまうため書き直す
-	elif node_type == "REPR2" or node_type == "COMP1" or node_type == "COMP2":
-		node_collection,color_map=draw_node_with_lch(G,pos,**kwargs)
-
-	nx.draw_networkx_edges(G,pos,ax=ax)
-	#if with_label==True:
-	#	nx.draw_networkx_labels(G,pos,font_size=int(12*100/dpi))
-	return node_collection,color_map
-
-"""オプションを読みやすい形式で保存.前処理をしてから渡す"""
-def save_drawoption(param_dict,path):
-	mymodule.save_option(param_dict,path)
 
 """
 HITSのパラメータに応じてノードのサイズを決定
@@ -302,19 +100,146 @@ def calc_nodesize(G,attr="a_score",weight_key="weight",min_size=1000,max_size=50
 		size_dict[node_no] = size
 	return size_dict
 
-"""
-urlからドメイン部分を抽出して返す．
-FQDNのドットで区切られたブロック数が3以下の場合，ドメイン名はFQDN自身
-4以上の場合，下3ブロックをドメインとして返す．
-@arg
-[IN]url:ドメインを取得したいURL
-@ret
-(unicode) domain
-"""
-def domain_detect(url):
-	FQDN = url.split("/")[2]
-	FQDN_list = FQDN.split(".")
-	return u".".join(FQDN_list[-3:])#開始点がリスト長より長くても問題なく無く動く
+def cvtRGB_to_HTML(RGB_1channel):
+	R,G,B = RGB_1channel
+	R_str = unicode("%02x"%R)
+	G_str = unicode("%02x"%G)
+	B_str = unicode("%02x"%B)
+	return u"#"+R_str+G_str+B_str
+
+def cvtLCH_to_HTML(LCH_1channel):
+	lch_img = np.ones((2,2,3),dtype=np.float32)*LCH_1channel
+	BGR_img = color_changer.cvtLCH2BGR(lch_img)
+	RGB_img = cv2.cvtColor(BGR_img,cv2.COLOR_BGR2RGB)
+	RGB_1channel = RGB_img[0,0]
+	return cvtRGB_to_HTML(RGB_1channel)
+
+def circler_color_converter(values,start_angle):
+	values = values+start_angle*np.pi
+	np.where(values<2*np.pi,values,values-2*np.pi)
+	return values
+
+def cvtRGBAflt2HTML(rgba):
+	rgb = rgba[0][:3]
+	rgb_uint = (rgb*255).astype(np.uint8)
+	return LDA_PCA.cvtRGB_to_HTML(rgb_uint)
+
+reg_d2v_pca = 0
+def get_color_map_vector1(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
+	global reg_d2v_pca
+	"""doc2vecのベクトルの方を主成分分析で1次元にして彩色"""
+	vector = d2v.values()
+	pca = decomposition.PCA(1)
+	pca.fit(vector)
+	d2v_pca = pca.transform(vector)
+	reg_d2v_pca = (d2v_pca-d2v_pca.min())/(d2v_pca.max()-d2v_pca.min())#0~1に正規化
+	h_values = circler_color_converter(reg_d2v_pca*2*np.pi,0.2).T[0]#列ヴェクトルとして与えられるため，1行に変換
+	make_lch_picker.draw_color_hist(h_values,resolution=50,lumine=lumine,color_map=cmap)#色変換の図を表示
+
+	"""寄与率計算のため，再度PCA"""
+	pca2 = decomposition.PCA(len(d2v.values()[0]))
+	pca2.fit(vector)
+	print pca2.explained_variance_ratio_
+
+	if cmap == "lch":
+		c_flt = 1.0
+		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
+		color_map = {}
+		for serial_no,node_no in enumerate(G.node.keys()):
+			d2v_no = file_id_dict_inv.get(node_no)
+			if d2v_no == None:
+				color_map[node_no] = r"#FFFFFF"
+				continue
+			h_value = h_values[d2v_no]
+			lch = np.array((lumine,c_flt,h_value),dtype=np.float32)
+			html_color = cvtLCH_to_HTML(lch)
+			color_map[node_no] = html_color
+
+	elif cmap == "jet":
+		# c_map = cm.jet
+		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
+		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
+		color_map = {}
+		for serial_no,node_no in enumerate(G.node.keys()):
+			d2v_no = file_id_dict_inv.get(node_no)
+			if d2v_no == None:
+				color_map[node_no] = r"#FFFFFF"
+				continue
+			color_map[node_no] = cvtRGBAflt2HTML(c_map(reg_d2v_pca[d2v_no]))
+	return color_map
+
+def cvtRGBAflt2HTML_3D(rgba):
+	rgb = []
+	rgb.append(rgba[0][0])
+	rgb.append(rgba[1][1])
+	rgb.append(rgba[2][2])
+	rgb = np.array(rgb)
+	rgb_uint = (rgb*255).astype(np.uint8)
+	return LDA_PCA.cvtRGB_to_HTML(rgb_uint)
+
+reg_d2v_pca = 0
+def get_color_map_vector3(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
+	global reg_d2v_pca
+	"""doc2vecのベクトルの方を主成分分析で3次元にして彩色"""
+	vector = d2v.values()
+	pca = decomposition.PCA(3)
+	pca.fit(vector)
+	d2v_pca = pca.transform(vector)
+	reg_d2v_pca = (d2v_pca-d2v_pca.min())/(d2v_pca.max()-d2v_pca.min())#0~1に正規化
+
+	"""寄与率計算のため，再度PCA"""
+	pca2 = decomposition.PCA(len(d2v.values()[0]))
+	pca2.fit(vector)
+	print pca2.explained_variance_ratio_
+
+	if cmap == "jet":
+		# c_map = cm.jet
+		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
+		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
+		color_map = {}
+		for serial_no,node_no in enumerate(G.node.keys()):
+			d2v_no = file_id_dict_inv.get(node_no)
+			if d2v_no == None:
+				color_map[node_no] = r"#FFFFFF"
+				continue
+			color_map[node_no] = cvtRGBAflt2HTML_3D(c_map(reg_d2v_pca[d2v_no]))
+	return color_map
+
+def draw_node_with_lch(G,pos,**kwargs):
+	d2v = kwargs.get("d2v")
+	size = kwargs.get("size")
+	draw_option = kwargs.get("draw_option")
+
+	color_map_by = draw_option.get("color_map_by")
+	comp_type = draw_option.get("comp_type")
+	lumine = draw_option.get("lumine")
+	cmap = draw_option.get("cmap")
+	ax = draw_option.get("ax")
+	pick_func = draw_option.get("pick_func")
+	lamb = draw_option.get("lamb")
+
+	if color_map_by == "vector1":
+		color_map = get_color_map_vector1(G,pos,d2v,comp_type,lumine=lumine,cmap=cmap)
+	elif color_map_by == "vector3":
+		color_map = get_color_map_vector3(G,pos,d2v,comp_type,lumine=lumine,cmap=cmap)
+	elif color_map_by == None:
+		color_map = dict.fromkeys(G,"#FFFFFF")
+
+	node_color = color_map.values()
+	size_array = size.values()
+	node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=node_color,node_size=size_array,ax=ax,pick_func=pick_func,lamb=lamb)
+	return node_collection,color_map
+
+def draw_network(G,pos,**kwargs):
+	draw_option = kwargs.get("draw_option")
+	node_type = draw_option.get("node_type")
+	ax = draw_option.get("ax")
+
+	color_map = None
+	if node_type == "COMP1":
+		node_collection,color_map = draw_node_with_lch(G,pos,**kwargs)
+	nx.draw_networkx_edges(G,pos,ax=ax)
+	return node_collection,color_map
 
 pos = 0
 def main(_params):
@@ -325,7 +250,7 @@ def main(_params):
 
 	"""パラメータの読み込み"""
 	root_dir = params.get("root_dir")
-	exp_name = params.get("exp_name")
+	exp_name = params.get("exp_name_new")
 	nx_dir = params.get("nx_dir")
 	src_pkl_name = params.get("src_pkl_name")
 	weights_pkl_name = params.get("weights_pkl_name")
@@ -349,9 +274,12 @@ def main(_params):
 		G = pickle.load(fi)
 	with open(os.path.join(nx_dir,weights_pkl_name)) as fi:
 		all_nodes_weights = pickle.load(fi)
-	with open(os.path.join(exp_dir,"instance.pkl")) as fi:
-		lda = pickle.load(fi)
+	with open(os.path.join(exp_dir,"doc2vec.pkl")) as fi:
+		d2v = pickle.load(fi)
 	print "data_loaded"
+
+	# with open(os.path.join(exp_dir,"instance.pkl")) as fi:
+	# 	lda = pickle.load(fi)
 
 	"""パラメータの読み込み"""
 	draw_option = params.get("draw_option")
@@ -411,7 +339,7 @@ def main(_params):
 
 	"""ノードサイズの計算"""
 	if type(size_attr) is dict:
-		# size_dict = calc_nodesize(G,attr=size_attr["type"],min_size=size_attr["min"],max_size=size_attr["max"])
+		# size_dict = calc_nodesize(G,attr=size_attr["type"],min_size=size_attr["min"],max_size=size_attr["max"],use_bhits=use_bhits,weight_key="weight")
 		size_dict = calc_nodesize(G,attr=size_attr["type"],min_size=size_attr["min"],max_size=size_attr["max"],use_bhits=use_bhits,weight_key="no_weight")
 	else:
 		size_dict = calc_nodesize(G,attr=size_attr)
@@ -420,23 +348,24 @@ def main(_params):
 	#new_color_map = draw_network(G,pos,size=size_dict,option=node_type,lda=lda,dpi=dpi,with_label=with_label,lumine=lumine,color_map_by=color_map_by,cmap=cmap)
 	draw_kwargs = {
 			"size":size_dict,
-			"lda":lda,
+			"d2v":d2v,
 			"draw_option":draw_option
 			}
+
 	node_collection,color_map = draw_network(G,pos,**draw_kwargs)
 	draw_option["used_color_map"] = color_map
 
 	plot_datas = {"node_collection":node_collection}
 	return plot_datas
 
-	#"""ネットワークの再保存"""
-	#if new_color_map is not None:#カラーマップの更新
-	#	nx.set_node_attributes(G,"color",new_color_map)
-	#d=nx.readwrite.json_graph.node_link_data(G)
-	#with codecs.open("graph.json","w",encoding="utf8")as fo:
-	#	json.dump(d,fo,indent=4,ensure_ascii=False)
-	#with open("final_graph.gpkl","w") as fo:
-	#	pickle.dump(G,fo)
+	"""ネットワークの再保存"""
+	# if new_color_map is not None:#カラーマップの更新
+	# 	nx.set_node_attributes(G,"color",new_color_map)
+	# d=nx.readwrite.json_graph.node_link_data(G)
+	# with codecs.open("graph.json","w",encoding="utf8")as fo:
+	# 	json.dump(d,fo,indent=4,ensure_ascii=False)
+	# with open("final_graph.gpkl","w") as fo:
+	# 	pickle.dump(G,fo)
 
 def graph_redraw(G,_pos=None,_color_map=None,**kwargs):
 	global pos
@@ -480,6 +409,7 @@ def collect_adjacents(G,node_no,link_type):
 			ret_list.append(edge[1])
 
 	return set(ret_list),edges
+
 
 """
 change adjacents color to white and hide edges
@@ -624,9 +554,17 @@ if __name__ == "__main__":
 	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
 	params["comp_func_name"] = "comp4_2"
 
-	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
-	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
-	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
+	params["size"] = 100
+	params["exp_name_new"] = "D" + unicode(params["size"]) + suffix_generator(params["target"],params["is_largest"])
+	params["comp_func_name_new"] = "cos_sim"
+
+	# params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
+	# params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
+	# params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
+
+	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name_new"]),"nx_datas")
+	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name_new"] + ".gpkl"
+	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name_new"] + ".gpkl"
 
 	params["draw_option"] = {
 		"weight_type":[],
@@ -654,7 +592,7 @@ if __name__ == "__main__":
 		"node_type":"COMP1",
 		"cmap":"jet",
 		"lumine":200,
-		"color_map_by":"theta",
+		"color_map_by":"vector",
 
 		"pos_rand_path":"nest1.rand",
 		"do_rescale":True,

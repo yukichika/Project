@@ -215,7 +215,7 @@ def bhits(G,max_iter=100,tol=1.0e-8,nstart=None,normalized=True,weight_key="weig
 		#nはリンク元、nbrリンク先
 		for n in h:
 			for nbr in G[n]:
-				"""denom=>"""
+				"""denom"""
 				around_n=set(G.node[n]["from_hosts"].keys())
 				around_nbr=set(G.node[n]["from_hosts"].keys())
 				denom=1
@@ -223,21 +223,9 @@ def bhits(G,max_iter=100,tol=1.0e-8,nstart=None,normalized=True,weight_key="weig
 					denom += G.node[n]["from_hosts"][co_host]
 
 				a[nbr]+=hlast[n]*G[n][nbr].get(weight_key,1)/denom
-		# for n in h:
-		# 	for nbr in G[n]:
-		#
-		# 		around_n=set(G.node[n]["from_hosts"].keys())
-		# 		around_nbr=set(G.node[n]["from_hosts"].keys())
-		# 		denom=1
-		# 		for co_host in (around_n & around_nbr):
-		# 			denom+=G.node[n]["from_hosts"][co_host]
-		#
-		# 		a[nbr]+=hlast[n]*G[n][nbr].get(weight_key,1)/denom
-		# now multiply h=Ga
 		"""ハブスコア"""
 		for n in h:
 			for nbr in G[n]:
-
 				around_n=set(G.node[n]["to_hosts"].keys())
 				around_nbr=set(G.node[n]["to_hosts"].keys())
 				denom=1
@@ -245,17 +233,6 @@ def bhits(G,max_iter=100,tol=1.0e-8,nstart=None,normalized=True,weight_key="weig
 					denom+=G.node[n]["to_hosts"][co_host]
 
 				h[n]+=a[nbr]*G[n][nbr].get(weight_key,1)/denom
-		# for n in h:
-		# 	for nbr in G[n]:
-		#
-		# 		around_n=set(G.node[n]["to_hosts"].keys())
-		# 		around_nbr=set(G.node[n]["to_hosts"].keys())
-		# 		denom=1
-		# 		for co_host in (around_n & around_nbr):
-		# 			denom+=G.node[n]["to_hosts"][co_host]
-		#
-		# 		h[n]+=a[nbr]*G[n][nbr].get(weight_key,1)/denom
-		# normalize vector
 		s=1.0/max(h.values())
 		for n in h: h[n]*=s
 		# normalize vector

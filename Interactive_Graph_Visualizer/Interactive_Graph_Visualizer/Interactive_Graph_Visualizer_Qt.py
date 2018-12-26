@@ -491,22 +491,28 @@ def main(args):
 	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
 
 	params["draw_option"] = {
+		#力学モデル
 		"weight_type":[],
 
+		#力学モデル+LDA
 		# "weight_type":["ATTR","REPUL"],
 
+		#力学モデル+LDA+HITS(auth_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
+		#力学モデル+LDA+HITS(hub_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
+		#力学モデル+LDA+BHITS(auth_score)
 		# "weight_type":["ATTR","REPUL","BHITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
+		#力学モデル+LDA+BHITS(hub_score)
 		# "weight_type":["ATTR","REPUL","BHITS"],
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},

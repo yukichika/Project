@@ -490,41 +490,43 @@ def main(args):
 	params["exp_name_new"] = "D" + unicode(params["size"]) + suffix_generator(params["target"],params["is_largest"])
 	params["comp_func_name_new"] = "cos_sim"
 
-	# params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
-	# params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
-	# params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
-
 	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name_new"]),"nx_datas")
 	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name_new"] + ".gpkl"
 	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name_new"] + ".gpkl"
 
 	params["draw_option"] = {
-		# "weight_type":[],
+		#力学モデル
+		"weight_type":[],
 
-		"weight_type":["ATTR","REPUL"],
+		#力学モデル+LDA
+		# "weight_type":["ATTR","REPUL"],
 
+		#力学モデル+LDA+HITS(auth_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
+		#力学モデル+LDA+HITS(hub_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
+		#力学モデル+LDA+BHITS(auth_score)
 		# "weight_type":["ATTR","REPUL","BHITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
+		#力学モデル+LDA+BHITS(hub_score)
 		# "weight_type":["ATTR","REPUL","BHITS"],
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		"lamb":0.5,
+		"lamb":0.25,
 
 		"node_type":"COMP1",
 		"cmap":"jet",
 		"lumine":200,
-		"color_map_by":"vector",
+		"color_map_by":"vector3",
 		# "color_map_by":"theta",
 
 		"pos_rand_path":"nest1.rand",
