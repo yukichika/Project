@@ -55,5 +55,5 @@ to_ext_links:リンク先のid（再選定後の外部リンク）
 ・Myexttext_html（txtファイル）  
 取得したWebページのテキスト文  
 
-・Dropped_html（html）  
+・Dropped_html（htmlファイル）  
 取得したWebページのhtml  
