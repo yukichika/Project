@@ -472,7 +472,7 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"iPhone"
+	params["search_word"] = u"千葉大学"
 	params["max_page"] = 400
 	add_childs = True
 	append = False
@@ -492,15 +492,15 @@ def main(args):
 
 	params["draw_option"] = {
 		#力学モデル
-		"weight_type":[],
+		# "weight_type":[],
 
 		#力学モデル+LDA
 		# "weight_type":["ATTR","REPUL"],
 
 		#力学モデル+LDA+HITS(auth_score)
-		# "weight_type":["ATTR","REPUL","HITS"],
-		# "weight_attr":{"type":"a_score","min":1,"max":3},
-		# "size_attr":{"type":"a_score","min":1000,"max":5000},
+		"weight_type":["ATTR","REPUL","HITS"],
+		"weight_attr":{"type":"a_score","min":1,"max":3},
+		"size_attr":{"type":"a_score","min":1000,"max":5000},
 
 		#力学モデル+LDA+HITS(hub_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
