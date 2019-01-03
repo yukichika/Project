@@ -75,6 +75,7 @@ if __name__ == "__main__":
 		os.mkdir(nx_dir_new)
 
 		weights_list = []
+		weights_list_new = []
 		euclids = []
 
 		comp_func_name = inifile.get('nx','comp_func_name')
@@ -88,7 +89,19 @@ if __name__ == "__main__":
 		with open(os.path.join(exp_dir_new,"doc2vec.pkl"),'rb') as fi:
 			doc2vec_vectors = pickle.load(fi)
 
-		"""エッジ間の距離算出（ユークリッド距離=>コサイン類似度）"""
+		"""0~1に正規化するために最大値・最小値の取得（自分自身は除く）"""
+		nodes = G.node
+		for i,i_node in enumerate(tqdm(nodes)):
+			p_dst = doc2vec_vectors[i_node]
+			for j,j_node in enumerate(nodes):
+				if not j == i:
+					q_dst = doc2vec_vectors[j_node]
+					weight = cos_sim(p_dst,q_dst)
+					weights_list.append(weight)
+		max = np.array(weights_list).max()
+		min = np.array(weights_list).min()
+
+		"""エッジ間の距離算出（ユークリッド距離=>コサイン類似度に変更）"""
 		edges = G.edge
 		for node_no,link_node_nos in edges.items():
 			p_dst = doc2vec_vectors[node_no]
@@ -96,24 +109,29 @@ if __name__ == "__main__":
 			for link_node_no in link_node_nos.keys():
 				q_dst = doc2vec_vectors[link_node_no]
 				weight = cos_sim(p_dst,q_dst)
+				weight = (weight - min)/(max - min)#0~1に正規化
+				if weight == 0:
+					weight = 0.001
 				edges[node_no][link_node_no]["weight"] = weight
 
 		DEFAULT_WEIGHT = 0.5
 		"""全ノード間距離算出．上といろいろ重複するが面倒なのでもう一度ループ（コサイン類似度）"""
 		nodes = G.node
 		nodes_lim = len(nodes)
-		all_node_weights = np.ones((nodes_lim,nodes_lim))*DEFAULT_WEIGHT#除算の都合上，自分自身との類似度は1に
+		all_node_weights = np.ones((nodes_lim,nodes_lim))*DEFAULT_WEIGHT
 		for i,i_node in enumerate(tqdm(nodes)):
 			p_dst = doc2vec_vectors[i_node]
 			for j,j_node in enumerate(nodes):
 				q_dst = doc2vec_vectors[j_node]
 				weight = cos_sim(p_dst,q_dst)
+				weight = (weight - min)/(max - min)#0~1に正規化
 				weight_euclid = compare4_2(p_dst,q_dst)
 				if weight == 0:
 					weight = 0.001
-				all_node_weights[i,j] = weight
-				weights_list.append(weight)#ヒストグラム作成用
-				euclids.append(weight_euclid)#ヒストグラム作成用
+				all_node_weights[i,j] = weight#自分自身との類似度は1を超えるが，使用しないため問題なし
+				if not j == i:
+					weights_list_new.append(weight)#ヒストグラム作成用
+					euclids.append(weight_euclid)#ヒストグラム作成用
 
 		"""データの書き出し"""
 		with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'w') as fo:
@@ -124,10 +142,11 @@ if __name__ == "__main__":
 		"""weight（全ノード間の距離）のヒストグラム作成（コサイン類似度）"""
 		fig_w = plt.figure()
 		ax = fig_w.add_subplot(1,1,1)
-		weights_array = np.array(weights_list,dtype=np.float)
+		weights_array = np.array(weights_list_new,dtype=np.float)
 		ax.hist(weights_array,bins=100)
 		plt.text(0.5, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
 		plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
+		plt.text(0.5, 0.80, "num="+str(len(weights_list_new)), transform=ax.transAxes)
 		fig_w.show()
 		fig_w.savefig(os.path.join(nx_dir_new,"cos_sim_hist.png"))
 
@@ -136,7 +155,11 @@ if __name__ == "__main__":
 		ax = fig_w.add_subplot(1,1,1)
 		weights_array = np.array(euclids,dtype=np.float)
 		ax.hist(weights_array,bins=100)
-		plt.text(0.5, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
-		plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
+		# plt.text(0.5, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
+		# plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
+		plt.text(0.5, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
+		plt.text(0.5, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
+		plt.text(0.5, 0.80, "num="+str(len(euclids)), transform=ax.transAxes)
+		plt.xlim([weights_array.min(),weights_array.max()])
 		fig_w.show()
 		fig_w.savefig(os.path.join(nx_dir_new,"comp4_2_hist.png"))
