@@ -1,3 +1,4 @@
+＜変化なし＞
 weight_type:["ATTR"(斥力計算に重みall_node_weightsを使う),
 	     "REPUL（引力計算にエッジの重みweightを使う）",
 	　　　　　"HITS"（HITSアルゴリズムを使う）,
@@ -5,14 +6,16 @@ weight_type:["ATTR"(斥力計算に重みall_node_weightsを使う),
 weight_attr:引力・斥力計算にHITSを使うか（使うならdictでオーソリティかハブか指定）
 size_attr:ノードの大きさにHITSを使うか（使うならdictでオーソリティかハブか指定）
 
-	
-node_type:ノードの着色方法（"COMP1"=>）
+
+＜変化あり＞
+node_type:ノードの着色方法（"COMP1"）
 cmap:色の対応付け方法(カラーバー) "jet" or "lch"
 lumine:lchを用いる場合の輝度
 color_map_by:主成分分析の対象（"vector1"=>doc2vecのベクトルを1次元に
 			     "vector3"=>doc2vecのベクトルを3次元に
 			     "None"=>無色）
 
+＜変化なし＞
 pos_rand_path:初期配置の乱数の格納ファイル．（未指定の場合は毎回乱数発生）
 do_rescale:リスケールの有無
 with_label:ラベル付与の有無

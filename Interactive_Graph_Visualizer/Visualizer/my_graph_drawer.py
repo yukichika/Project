@@ -100,12 +100,10 @@ def calc_nodesize(G,attr="a_score",weight_key="weight",min_size=1000,max_size=50
 		size_dict[node_no] = size
 	return size_dict
 
-def cvtRGB_to_HTML(RGB_1channel):
-	R,G,B = RGB_1channel
-	R_str = unicode("%02x"%R)
-	G_str = unicode("%02x"%G)
-	B_str = unicode("%02x"%B)
-	return u"#"+R_str+G_str+B_str
+def circler_color_converter(values,start_angle):
+	values = values+start_angle*np.pi
+	np.where(values<2*np.pi,values,values-2*np.pi)#（条件式，True，False）
+	return values
 
 def cvtLCH_to_HTML(LCH_1channel):
 	lch_img = np.ones((2,2,3),dtype=np.float32)*LCH_1channel
@@ -114,11 +112,15 @@ def cvtLCH_to_HTML(LCH_1channel):
 	RGB_1channel = RGB_img[0,0]
 	return cvtRGB_to_HTML(RGB_1channel)
 
-def circler_color_converter(values,start_angle):
-	values = values+start_angle*np.pi
-	np.where(values<2*np.pi,values,values-2*np.pi)
-	return values
+"RGB値=>16進数のカラーコード"
+def cvtRGB_to_HTML(RGB_1channel):
+	R,G,B = RGB_1channel
+	R_str = unicode("%02x"%R)
+	G_str = unicode("%02x"%G)
+	B_str = unicode("%02x"%B)
+	return u"#"+R_str+G_str+B_str
 
+"""rgba(jetカラーマップの値)=>RGB(0~255)=>16進数のカラーコード"""
 def cvtRGBAflt2HTML(rgba):
 	rgb = rgba[0][:3]
 	rgb_uint = (rgb*255).astype(np.uint8)
@@ -131,8 +133,8 @@ def get_color_map_vector1(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
 	vector = d2v.values()
 	pca = decomposition.PCA(1)
 	pca.fit(vector)
-	d2v_pca = pca.transform(vector)
-	reg_d2v_pca = (d2v_pca-d2v_pca.min())/(d2v_pca.max()-d2v_pca.min())#0~1に正規化
+	d2v_pca = pca.transform(vector)#第一主成分
+	reg_d2v_pca = (d2v_pca-d2v_pca.min())/(d2v_pca.max()-d2v_pca.min())#第一主成分を0~1に正規化
 	h_values = circler_color_converter(reg_d2v_pca*2*np.pi,0.2).T[0]#列ヴェクトルとして与えられるため，1行に変換
 	make_lch_picker.draw_color_hist(h_values,resolution=50,lumine=lumine,color_map=cmap)#色変換の図を表示
 
@@ -151,11 +153,11 @@ def get_color_map_vector1(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
 				color_map[node_no] = r"#FFFFFF"
 				continue
 			h_value = h_values[d2v_no]
-			lch = np.array((lumine,c_flt,h_value),dtype=np.float32)
+			lch = np.array((lumine,c_flt,h_value),dtype=np.float32)#（[輝度,？,？]）
 			html_color = cvtLCH_to_HTML(lch)
 			color_map[node_no] = html_color
 
-	elif cmap == "jet":
+	elif cmap == "jet":#jetカラーマップ
 		# c_map = cm.jet
 		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
 		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
@@ -165,45 +167,45 @@ def get_color_map_vector1(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
 			if d2v_no == None:
 				color_map[node_no] = r"#FFFFFF"
 				continue
-			color_map[node_no] = cvtRGBAflt2HTML(c_map(reg_d2v_pca[d2v_no]))
+			color_map[node_no] = cvtRGBAflt2HTML(c_map(reg_d2v_pca[d2v_no]))#（R,G,B）=>16進数のカラーコード
 	return color_map
 
-def cvtRGBAflt2HTML_3D(rgba):
-	rgb = []
-	rgb.append(rgba[0][0])
-	rgb.append(rgba[1][1])
-	rgb.append(rgba[2][2])
-	rgb = np.array(rgb)
-	rgb_uint = (rgb*255).astype(np.uint8)
-	return LDA_PCA.cvtRGB_to_HTML(rgb_uint)
-
-reg_d2v_pca = 0
-def get_color_map_vector3(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
-	global reg_d2v_pca
-	"""doc2vecのベクトルの方を主成分分析で3次元にして彩色"""
-	vector = d2v.values()
-	pca = decomposition.PCA(3)
-	pca.fit(vector)
-	d2v_pca = pca.transform(vector)
-	reg_d2v_pca = (d2v_pca-d2v_pca.min())/(d2v_pca.max()-d2v_pca.min())#0~1に正規化
-
-	"""寄与率計算のため，再度PCA"""
-	pca2 = decomposition.PCA(len(d2v.values()[0]))
-	pca2.fit(vector)
-	print pca2.explained_variance_ratio_
-
-	if cmap == "jet":
-		# c_map = cm.jet
-		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
-		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
-		color_map = {}
-		for serial_no,node_no in enumerate(G.node.keys()):
-			d2v_no = file_id_dict_inv.get(node_no)
-			if d2v_no == None:
-				color_map[node_no] = r"#FFFFFF"
-				continue
-			color_map[node_no] = cvtRGBAflt2HTML_3D(c_map(reg_d2v_pca[d2v_no]))
-	return color_map
+# def cvtRGBAflt2HTML_3D(rgba):
+# 	rgb = []
+# 	rgb.append(rgba[0][0])
+# 	rgb.append(rgba[1][1])
+# 	rgb.append(rgba[2][2])
+# 	rgb = np.array(rgb)
+# 	rgb_uint = (rgb*255).astype(np.uint8)
+# 	return LDA_PCA.cvtRGB_to_HTML(rgb_uint)
+#
+# reg_d2v_pca = 0
+# def get_color_map_vector3(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
+# 	global reg_d2v_pca
+# 	"""doc2vecのベクトルの方を主成分分析で3次元にして彩色"""
+# 	vector = d2v.values()
+# 	pca = decomposition.PCA(3)
+# 	pca.fit(vector)
+# 	d2v_pca = pca.transform(vector)
+# 	reg_d2v_pca = (d2v_pca-d2v_pca.min())/(d2v_pca.max()-d2v_pca.min())#0~1に正規化
+#
+# 	"""寄与率計算のため，再度PCA"""
+# 	pca2 = decomposition.PCA(len(d2v.values()[0]))
+# 	pca2.fit(vector)
+# 	print pca2.explained_variance_ratio_
+#
+# 	if cmap == "jet":
+# 		# c_map = cm.jet
+# 		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
+# 		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
+# 		color_map = {}
+# 		for serial_no,node_no in enumerate(G.node.keys()):
+# 			d2v_no = file_id_dict_inv.get(node_no)
+# 			if d2v_no == None:
+# 				color_map[node_no] = r"#FFFFFF"
+# 				continue
+# 			color_map[node_no] = cvtRGBAflt2HTML_3D(c_map(reg_d2v_pca[d2v_no]))
+# 	return color_map
 
 def draw_node_with_lch(G,pos,**kwargs):
 	d2v = kwargs.get("d2v")
@@ -218,11 +220,11 @@ def draw_node_with_lch(G,pos,**kwargs):
 	pick_func = draw_option.get("pick_func")
 	lamb = draw_option.get("lamb")
 
-	if color_map_by == "vector1":
+	if color_map_by == "vector1":#主成分分析の対象がdoc2vecのベクトルで，1次元に主成分分析
 		color_map = get_color_map_vector1(G,pos,d2v,comp_type,lumine=lumine,cmap=cmap)
-	elif color_map_by == "vector3":
-		color_map = get_color_map_vector3(G,pos,d2v,comp_type,lumine=lumine,cmap=cmap)
-	elif color_map_by == None:
+	# elif color_map_by == "vector3":#主成分分析の対象がdoc2vecのベクトルで，3次元に主成分分析
+	# 	color_map = get_color_map_vector3(G,pos,d2v,comp_type,lumine=lumine,cmap=cmap)
+	elif color_map_by == None:#無色
 		color_map = dict.fromkeys(G,"#FFFFFF")
 
 	node_color = color_map.values()
@@ -251,9 +253,9 @@ def main(_params):
 	"""パラメータの読み込み"""
 	root_dir = params.get("root_dir")
 	exp_name = params.get("exp_name_new")
-	nx_dir = params.get("nx_dir")
-	src_pkl_name = params.get("src_pkl_name")
-	weights_pkl_name = params.get("weights_pkl_name")
+	nx_dir = params.get("nx_dir")#doc2vecのフォルダ
+	src_pkl_name = params.get("src_pkl_name")#doc2vecのファイル（ネットワーク）
+	weights_pkl_name = params.get("weights_pkl_name")#doc2vecのファイル（重み）
 
 	"""関連フォルダの存在確認"""
 	if not os.path.exists(root_dir):
