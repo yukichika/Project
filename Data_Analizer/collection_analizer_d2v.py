@@ -292,7 +292,7 @@ if __name__=="__main__":
 		"to_ext_links",#["to_ext_links"]の数
 		"repTopic",#代表トピック
 		"hits",#HITSスコア
-		"topics",#
+		"topics",#トピック分布
 		"pca_lda",#LDAの主成分分析
 		"pca_d2v"#D2Vの主成分分析
 		]

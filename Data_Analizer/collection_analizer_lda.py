@@ -80,10 +80,10 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 			node = json.load(fj)
 		id = file_id_dict_inv[file_no]
 		tgt_row = i+1
-		#file_no=lda.file_id_dict[id]
+		#file_no = lda.file_id_dict[id]
 
 		#if domain not in in_domain_titles.keys():
-		#	in_domain_titles[domain]=set()
+		#	in_domain_titles[domain] = set()
 		for j,param in enumerate(tgt_params):
 			val = 0
 			c_format = None
@@ -264,11 +264,11 @@ if __name__=="__main__":
 		"domain",#ドメイン名
 		"len_parents",#["parents"]の数
 		"len_childs",#["childs"]の数
-		"to_int_links",#["to_int_links"]の数
-		"to_ext_links",#["to_ext_links"]の数
+		"to_int_links",#["to_int_links"]（内部リンク）の数
+		"to_ext_links",#["to_ext_links"]（外部リンク）の数
 		"repTopic",#代表トピック
 		"hits",#HITSスコア
-		"topics",#
+		"topics",#トピック分布
 		"pca_lda"#LDAの主成分分析
 		]
 
