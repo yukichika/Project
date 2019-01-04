@@ -20,8 +20,8 @@ zenhan 0.5.2
 ```
 
 ## How to Use(for LDA)
-収集したWebページに対する可視化前のスクリプト．(python2)  
-基本的にseries_act.pyを使用．  
+収集したWebページに対する可視化前のスクリプト．  
+基本的にseries_act.py(python2)を使用．  
 テキストの特徴量として，LDAのトピック分布を利用．  
 
 ・cvt_to_nxtype2.py  
@@ -42,8 +42,8 @@ bhitsを計算するために，リンク先・リンク元のドメインをGに反映.
 
 
 ## How to Use(for Doc2vec)
-LDAでの結果をDoc2vecの結果に置き換えるスクリプト．(python3&python2)  
-D2V_for_SS.py→D2V_modify_for_graph.pyの順に回す．  
+LDAでの結果をDoc2vecの結果に置き換えるスクリプト．  
+D2V_for_SS.py(python3)→D2V_modify_for_graph.py(python2)の順に回す．  
 テキストの特徴量として，Doc2vecのベクトルを利用．  
 
 ・Preprocessing.py(python3)  

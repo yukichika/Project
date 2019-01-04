@@ -41,7 +41,7 @@ langdetect_time:テキストのチェックに要する時間
 id:取得ページのid
 childs:リンク先のid（外部リンク・内部リンクは指定済み）
 fwdlink_time:内部リンク・外部リンクの選定に要する時間
-ｍｙexttext:取得ページのテキスト文（My_extract_content.pyのstrip_tagsにより取得）
+myexttext:取得ページのテキスト文（My_extract_content.pyのstrip_tagsにより取得）
 to_int_links:リンク先のid（再選定後の内部リンク）
 to_ext_links:リンク先のid（再選定後の外部リンク）
 ```
