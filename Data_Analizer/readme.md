@@ -47,4 +47,26 @@ PCAで次元圧縮した空間と元のトピック分布との対応づけ．
 トピック空間での主成分ベクトルを用いてカラーマップから単語分布を逆引き．  
 
 ・collection_analizer_d2v.py  
+Doc2vec（1次元）により構築したグラフデータを分析するために，エクセルに出力．  
 
+取得一覧  
+```
+<collection_analizer>
+id:Doc2vecの通し番号
+name_id:ファイルid
+len(text):文字数
+url:URL
+domain:ドメイン名
+len_parent:親リンク数
+len_childs:子リンク数
+to_int_links:内部リンク数
+to_ext_links:外部リンク数
+repTopic:代表トピック
+pca_lda:LDAトピック分布の第一主成分
+pca_d2v:Doc2vecベクトルの第一主成分
+auth_score:オーソリティスコア
+hub_score:ハブスコア
+
+<topics>
+トピック毎の単語分布
+```
