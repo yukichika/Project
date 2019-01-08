@@ -43,7 +43,7 @@ bhitsを計算するために，リンク先・リンク元のドメインをGに反映.
 
 ## How to Use(for Doc2vec)
 LDAでの結果をDoc2vecの結果に置き換えるスクリプト．  
-D2V_for_SS.py(python3)→D2V_modify_for_graph.py(python2)の順に回す．  
+D2V_for_SS.py(python3)→D2V_modify_for_graph.py(python2)→cluster.py(python2)の順に回す．  
 テキストの特徴量として，Doc2vecのベクトルを利用．  
 
 ・Preprocessing.py(python3)  
