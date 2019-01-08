@@ -67,5 +67,5 @@ doc2vec‚ÌƒxƒNƒgƒ‹‚Ì—ÞŽ—“x‚ðƒRƒTƒCƒ“—ÞŽ—“xEƒ†[ƒNƒŠƒbƒh‹——£EŽw”‚Å³‹K‰»‚µ‚½ƒ†
 
 Echeck_distance_d2v.py(python2)  
 ‰ÂŽ‹‰»‚·‚éWebƒy[ƒWŠÔ‚Ì—ÞŽ—“x‚Ì•ª•ziŽ©•ªŽ©g‚Íœ‚­j‚ð•Û‘¶D  
-ƒRƒTƒCƒ“—ÞŽ—“xEƒRƒTƒCƒ“—ÞŽ—“x(0~1‚É³‹K‰»)Eƒ†[ƒNƒŠƒbƒh‹——£Eƒ†[ƒNƒŠƒbƒh‹——£(0~1‚É³‹K‰»)EŽw”‚Å³‹K‰»‚µ‚½ƒ†[ƒNƒŠƒbƒh‹——£‚ðŽg—pD  
+ƒRƒTƒCƒ“—ÞŽ—“xEƒRƒTƒCƒ“—ÞŽ—“x(³‹K‰»)Eƒ†[ƒNƒŠƒbƒh‹——£Eƒ†[ƒNƒŠƒbƒh‹——£(³‹K‰»)EŽw”‚Å³‹K‰»‚µ‚½ƒ†[ƒNƒŠƒbƒh‹——£‚ðŽg—pD  
 
