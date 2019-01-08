@@ -492,10 +492,10 @@ def main(args):
 
 	params["draw_option"] = {
 		#力学モデル
-		# "weight_type":[],
+		"weight_type":[],
 
 		#力学モデル+LDA
-		"weight_type":["ATTR","REPUL"],
+		# "weight_type":["ATTR","REPUL"],
 
 		#力学モデル+LDA+HITS(auth_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
@@ -519,7 +519,7 @@ def main(args):
 
 		"lamb":0.5,
 
-		"node_type":"COMP1",
+		"node_type":"REPR",
 		"cmap":"jet",
 		"lumine":200,
 		"color_map_by":"theta",

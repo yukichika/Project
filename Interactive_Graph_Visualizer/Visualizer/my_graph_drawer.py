@@ -157,7 +157,7 @@ def get_color_map_vector1(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
 			html_color = cvtLCH_to_HTML(lch)
 			color_map[node_no] = html_color
 
-	elif cmap == "jet":#jetカラーマップ
+	elif cmap == "jet":
 		# c_map = cm.jet
 		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
 		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
@@ -236,10 +236,21 @@ def draw_network(G,pos,**kwargs):
 	draw_option = kwargs.get("draw_option")
 	node_type = draw_option.get("node_type")
 	ax = draw_option.get("ax")
+	size = kwargs.get("size")
+	pick_func = draw_option.get("pick_func")
 
 	color_map = None
-	if node_type == "COMP1":
+	if node_type == "COMP1":#doc2vecのベクトルを主成分分析で可視化
 		node_collection,color_map = draw_node_with_lch(G,pos,**kwargs)
+	elif node_type == "kmeans3":#クラスタリング結果で可視化
+		color_map = nx.get_node_attributes(G,"color_k3")
+		size_array = size.values()
+		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax,pick_func=pick_func);
+	elif node_type == "kmeans100":#クラスタリング結果で可視化
+		color_map = nx.get_node_attributes(G,"color_k100")
+		size_array = size.values()
+		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax,pick_func=pick_func);
+
 	nx.draw_networkx_edges(G,pos,ax=ax)
 	return node_collection,color_map
 

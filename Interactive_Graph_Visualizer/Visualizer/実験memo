@@ -8,7 +8,9 @@ size_attr:ノードの大きさにHITSを使うか（使うならdictでオー�
 
 
 ＜変化あり＞
-node_type:ノードの着色方法（"COMP1"）
+node_type:ノードの着色方法（"COMP1"
+			 "kmeans3"
+			 "kmeans100"）
 cmap:色の対応付け方法(カラーバー) "jet" or "lch"
 lumine:lchを用いる場合の輝度
 color_map_by:主成分分析の対象（"vector1"=>doc2vecのベクトルを1次元に

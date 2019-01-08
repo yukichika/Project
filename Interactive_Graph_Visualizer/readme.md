@@ -2,7 +2,7 @@
 
 ## How to Use
 ・Interactive_Graph_Visualizer  
-Fukunagaさんの再現実験用の可視化スクリプト．  
+再現実験用の可視化スクリプト．  
 LDAの結果を用いる．  
 
 ・Visualizer  

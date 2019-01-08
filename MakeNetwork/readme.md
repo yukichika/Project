@@ -56,6 +56,7 @@ Webページのidがキー，numpy型のベクトルが要素の辞書で保存．
 ・D2V_modify_for_graph.py(python2)  
 エッジ間の重みをDoc2vecのベクトルで取得しnetworkxに反映．  
 また，全ノード間の重み（距離）も計算して保存．  
+（コサイン類似度とユークリッド距離の2パターン）
 
 ・cluster.py(python2)  
 doc2vecのベクトルでクラスタリングして，クラスタの情報をグラフに反映．  

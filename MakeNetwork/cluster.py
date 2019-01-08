@@ -37,6 +37,9 @@ def suffix_generator(target=None,is_largest=False):
 		suffix += "_largest"
 	return suffix
 
+COLORLIST_R = [r"#EB6100",r"#F39800",r"#FCC800",r"#FFF100",r"#CFDB00",r"#8FC31F",r"#22AC38",r"#009944",r"#009B6B",r"#009E96",r"#00A0C1",r"#00A0E9",r"#0086D1",r"#0068B7",r"#00479D",r"#1D2088",r"#601986",r"#920783",r"#BE0081",r"#E4007F",r"#E5006A",r"#E5004F",r"#E60033"]
+COLORLIST = [c for c in COLORLIST_R[::2]]
+
 if __name__ == "__main__":
 	"""設定ファイルの読み込み"""
 	inifile = configparser.ConfigParser(allow_no_value = True,interpolation = configparser.ExtendedInterpolation())
@@ -66,6 +69,8 @@ if __name__ == "__main__":
 			doc2vec_vectors = pickle.load(fi)
 		with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'rb') as fi:
 			G = pickle.load(fi)
+		with open(os.path.join(nx_dir_new,"G_with_params_euclid.gpkl"),'rb') as fi:
+			G_euc = pickle.load(fi)
 
 		if G.node.keys() == doc2vec_vectors.keys():
 			print("ノード数：" + str(len(G.node.keys())))
@@ -88,7 +93,7 @@ if __name__ == "__main__":
 			print(result_sum)
 
 			with open(os.path.join(nx_dir_new,"kmeans_n" + str(n_clusters) + "_d" + str(len(doc2vec_vectors[0])) + ".txt"),'w') as fo:
-				fo.write("クラスタ：総数")
+				fo.write("クラスタ：総数" + "\n")
 				for k,v in result_sum.items():
 					fo.write(str(k) + ":" + str(v) + "\n")
 
@@ -103,16 +108,29 @@ if __name__ == "__main__":
 			print(result_sum)
 
 			with open(os.path.join(nx_dir_new,"kmeans_n" + str(n_clusters) + "_d" + str(len(data_array_pca[0])) + ".txt"),'w') as fo:
-				fo.write("クラスタ：総数")
+				fo.write("クラスタ：総数" + "\n")
 				for k,v in result_sum.items():
 					fo.write(str(k) + ":" + str(v) + "\n")
 
 			"""グラフに反映"""
 			nodes = G.node
+			nodes_euc = G_euc.node
 			for node_no,p,p_pca in zip(G.node.keys(),pred,pred_pca):
-				nodes[node_no]["kmeans_100"] = p
-				nodes[node_no]["kmeans_3"] = p_pca
+				kmeans_100 = p
+				kmeans_3 = p_pca
+
+				nodes[node_no]["kmeans_100"] = kmeans_100
+				nodes[node_no]["kmeans_3"] = kmeans_3
+				nodes[node_no]["color_k3"] = COLORLIST[kmeans_3]
+				nodes[node_no]["color_k100"] = COLORLIST[kmeans_100]
+
+				nodes_euc[node_no]["kmeans_100"] = kmeans_100
+				nodes_euc[node_no]["kmeans_3"] = kmeans_3
+				nodes_euc[node_no]["color_k3"] = COLORLIST[kmeans_3]
+				nodes_euc[node_no]["color_k100"] = COLORLIST[kmeans_100]
 
 			"""データの書き出し"""
 			with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'w') as fo:
 				pickle.dump(G,fo)
+			with open(os.path.join(nx_dir_new,"G_with_params_euclid.gpkl"),'w') as fo:
+				pickle.dump(G_euc,fo)
