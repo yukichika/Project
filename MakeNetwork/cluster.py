@@ -9,6 +9,7 @@ from distutils.util import strtobool
 import numpy as np
 from tqdm import tqdm
 from sklearn.cluster import KMeans
+from sklearn import decomposition
 import matplotlib.cm as cm
 
 import sys
@@ -69,23 +70,49 @@ if __name__ == "__main__":
 		if G.node.keys() == doc2vec_vectors.keys():
 			print("ノード数：" + str(len(G.node.keys())))
 
-			data = [doc2vec_vectors[x] for x in tqdm(doc2vec_vectors.keys())]
-			data_array = np.array(data)
+			data_array = doc2vec_vectors.values()
+
+			pca = decomposition.PCA(3)
+			pca.fit(data_array)
+			data_array_pca = pca.transform(data_array)
 
 			n_clusters = 10
-			pred = KMeans(n_clusters=n_clusters).fit_predict(data)
+			"""ベクトルの次元数を保持したままクラスタリング"""
+			kmeans = KMeans(n_clusters=n_clusters,random_state=0).fit(data_array)
+			pred = kmeans.labels_
+			# print(kmeans.cluster_centers_)
 
-			""""""
 			u, c = np.unique(pred,return_counts=True)
 			result_sum = dict(zip(u, c))
+			print("-----ベクトルの次元数を保持したままクラスタリング-----")
 			print(result_sum)
 
-			# for i,node_no in enumerate(G.node.keys()):
-			# 	print(i)
+			with open(os.path.join(nx_dir_new,"kmeans_n" + str(n_clusters) + "_d" + str(len(doc2vec_vectors[0])) + ".txt"),'w') as fo:
+				fo.write("クラスタ：総数")
+				for k,v in result_sum.items():
+					fo.write(str(k) + ":" + str(v) + "\n")
 
+			"""ベクトルの次元数を主成分分析で圧縮してクラスタリング"""
+			kmeans_pca = KMeans(n_clusters=n_clusters,random_state=0).fit(data_array_pca)
+			pred_pca = kmeans_pca.labels_
+			# print(kmeans_pca.cluster_centers_)
 
-		"""データの書き出し"""
-		# with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'w') as fo:
-		# 	pickle.dump(G,fo)
-		# with open(os.path.join(nx_dir_new,"all_node_weights_cos_sim.gpkl"),'w') as fo:
-		# 	pickle.dump(all_node_weights,fo)
+			u, c = np.unique(pred_pca,return_counts=True)
+			result_sum = dict(zip(u, c))
+			print("-----ベクトルの次元数を主成分分析で圧縮してクラスタリング-----")
+			print(result_sum)
+
+			with open(os.path.join(nx_dir_new,"kmeans_n" + str(n_clusters) + "_d" + str(len(data_array_pca[0])) + ".txt"),'w') as fo:
+				fo.write("クラスタ：総数")
+				for k,v in result_sum.items():
+					fo.write(str(k) + ":" + str(v) + "\n")
+
+			"""グラフに反映"""
+			nodes = G.node
+			for node_no,p,p_pca in zip(G.node.keys(),pred,pred_pca):
+				nodes[node_no]["kmeans_100"] = p
+				nodes[node_no]["kmeans_3"] = p_pca
+
+			"""データの書き出し"""
+			with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'w') as fo:
+				pickle.dump(G,fo)

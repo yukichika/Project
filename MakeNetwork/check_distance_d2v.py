@@ -10,12 +10,6 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-import sys
-sys.path.append("../MyPythonModule")
-import mymodule
-sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
-import networkx as nx
-
 """コサイン類似度"""
 def cos_sim(v1, v2):
 	return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))

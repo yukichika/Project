@@ -58,7 +58,6 @@ if __name__ == "__main__":
 			if i+1 == topn:
 				break
 
-
 	with open(os.path.join(INPUT,target.split(".")[0] + "_euclid.txt"),'w',encoding='UTF-8') as f_euclid:
 		f_euclid.write(target + "\n\n")
 		for j,e in enumerate(euclid_):
@@ -72,18 +71,3 @@ if __name__ == "__main__":
 			f_euclid_index.write(e_index[0] + ":" + str(e_index[1]) + "\n")
 			if k+1 == topn:
 				break
-
-
-
-	# """全ノード間距離算出(自分自身は除く)"""
-	# for i,i_node in enumerate(tqdm(nodes)):
-	# 	p_dst = doc2vec_vectors[i_node]
-	# 	for j,j_node in enumerate(nodes):
-	# 		if not j == i:
-	# 			q_dst = doc2vec_vectors[j_node]
-	# 			weight_cos = cos_sim(p_dst,q_dst)
-	# 			weight_cos = (weight_cos - min_cos)/(max_cos - min_cos)#0~1に正規化
-	# 			cos_norm.append(weight_cos)
-	# 			weight_euclid = euclid(p_dst,q_dst)
-	# 			weight_euclid = (weight_euclid - min_euclid)/(max_euclid - min_euclid)#0~1に正規化
-	# 			euclid_norm.append(weight_euclid)
