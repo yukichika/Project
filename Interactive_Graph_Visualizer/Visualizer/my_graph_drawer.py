@@ -238,15 +238,42 @@ def draw_network(G,pos,**kwargs):
 	ax = draw_option.get("ax")
 	size = kwargs.get("size")
 	pick_func = draw_option.get("pick_func")
+	lamb = draw_option.get("lamb")
 
 	color_map = None
 	if node_type == "COMP1":#doc2vecのベクトルを主成分分析で可視化
 		node_collection,color_map = draw_node_with_lch(G,pos,**kwargs)
-	elif node_type == "kmeans3":#クラスタリング結果で可視化
+	elif node_type == "kmeans100_j":
+		k100_dict = nx.get_node_attributes(G,"kmeans_100")
+		k100 = np.array(k100_dict.values())
+		k100 = k100.astype("float32")
+		k100 = (k100-k100.min())/(k100.max()-k100.min())
+
+		c_map = cm.jet_r
+		color_map = {}
+		for serial_no,node_no in enumerate(G.node.keys()):
+			color_map[node_no] = cvtRGBAflt2HTML(c_map([k100[serial_no]]))
+		node_color = color_map.values()
+		size_array = size.values()
+		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=node_color,node_size=size_array,ax=ax,pick_func=pick_func,lamb=lamb)
+	elif node_type == "kmeans3_j":
+		k3_dict = nx.get_node_attributes(G,"kmeans_3")
+		k3 = np.array(k3_dict.values())
+		k3 = k3.astype("float32")
+		k3 = (k3-k3.min())/(k3.max()-k3.min())
+
+		c_map = cm.jet_r
+		color_map = {}
+		for serial_no,node_no in enumerate(G.node.keys()):
+			color_map[node_no] = cvtRGBAflt2HTML(c_map([k3[serial_no]]))
+		node_color = color_map.values()
+		size_array = size.values()
+		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=node_color,node_size=size_array,ax=ax,pick_func=pick_func,lamb=lamb)
+	elif node_type == "kmeans3":#クラスタリング結果で可視化(用意したカラーリスト)
 		color_map = nx.get_node_attributes(G,"color_k3")
 		size_array = size.values()
 		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax,pick_func=pick_func);
-	elif node_type == "kmeans100":#クラスタリング結果で可視化
+	elif node_type == "kmeans100":#クラスタリング結果で可視化(用意したカラーリスト)
 		color_map = nx.get_node_attributes(G,"color_k100")
 		size_array = size.values()
 		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax,pick_func=pick_func);

@@ -521,9 +521,9 @@ def main(args):
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		"lamb":0.5,
+		"lamb":0.25,
 
-		"node_type":"COMP1",
+		"node_type":"kmeans3_j",
 		"cmap":"jet",
 		"lumine":200,
 		"color_map_by":"vector1",
