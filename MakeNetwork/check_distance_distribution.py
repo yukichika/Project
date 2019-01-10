@@ -10,6 +10,10 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
+import sys
+sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
+import networkx as nx
+
 """コサイン類似度"""
 def cos_sim(v1, v2):
 	return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
@@ -67,7 +71,7 @@ if __name__ == "__main__":
 	exp_name_new = "D" + str(size) + suffix_generator(target,is_largest)
 	exp_dir_new = os.path.join(root_dir,exp_name_new)
 	nx_dir_new = os.path.join(exp_dir_new,"nx_datas")
-	check_dir = os.path.join(nx_dir_new,"check_distance")
+	check_dir = os.path.join(nx_dir_new,"check_distance_distribution")
 
 	if not os.path.exists(check_dir):
 		os.mkdir(check_dir)
@@ -82,8 +86,8 @@ if __name__ == "__main__":
 	G_path = "G_with_params_" + comp_func_name + ".gpkl"
 
 	"""ファイルの読み込み"""
-	with open(os.path.join(exp_dir,"instance.pkl"),'r') as fi:
-		lda = pickle.load(fi)
+	# with open(os.path.join(exp_dir,"instance.pkl"),'r') as fi:
+	# 	lda = pickle.load(fi)
 	with open(os.path.join(nx_dir,G_path),'r') as fi:
 		G = pickle.load(fi)
 	with open(os.path.join(exp_dir_new,"doc2vec.pkl"),'rb') as fi:
@@ -126,9 +130,9 @@ if __name__ == "__main__":
 	ax = fig_w.add_subplot(1,1,1)
 	weights_array = np.array(cos,dtype=np.float)
 	ax.hist(weights_array,bins=100)
-	plt.text(0.5, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
-	plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.5, 0.80, "num="+str(len(cos)), transform=ax.transAxes)
+	plt.text(0.8, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
+	plt.text(0.8, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "num="+str(len(cos)), transform=ax.transAxes)
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"cos.png"))
 
@@ -137,9 +141,9 @@ if __name__ == "__main__":
 	ax = fig_w.add_subplot(1,1,1)
 	weights_array = np.array(cos_norm,dtype=np.float)
 	ax.hist(weights_array,bins=100)
-	plt.text(0.5, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
-	plt.text(0.5, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.5, 0.80, "num="+str(len(cos_norm)), transform=ax.transAxes)
+	plt.text(0.8, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
+	plt.text(0.8, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "num="+str(len(cos_norm)), transform=ax.transAxes)
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"cos_norm.png"))
 
@@ -148,9 +152,9 @@ if __name__ == "__main__":
 	ax = fig_w.add_subplot(1,1,1)
 	weights_array = np.array(euclid_,dtype=np.float)
 	ax.hist(weights_array,bins=100)
-	plt.text(0.5, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
-	plt.text(0.5, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.5, 0.80, "num="+str(len(euclid_)), transform=ax.transAxes)
+	plt.text(0.8, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
+	plt.text(0.8, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "num="+str(len(euclid_)), transform=ax.transAxes)
 	plt.xlim([weights_array.min(),weights_array.max()])
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"euclid.png"))
@@ -160,9 +164,9 @@ if __name__ == "__main__":
 	ax = fig_w.add_subplot(1,1,1)
 	weights_array = np.array(euclid_norm,dtype=np.float)
 	ax.hist(weights_array,bins=100)
-	plt.text(0.5, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
-	plt.text(0.5, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.5, 0.80, "num="+str(len(euclid_norm)), transform=ax.transAxes)
+	plt.text(0.8, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
+	plt.text(0.8, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "num="+str(len(euclid_norm)), transform=ax.transAxes)
 	plt.xlim([weights_array.min(),weights_array.max()])
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"euclid_norm.png"))
@@ -172,9 +176,9 @@ if __name__ == "__main__":
 	ax = fig_w.add_subplot(1,1,1)
 	weights_array = np.array(euclid_index,dtype=np.float)
 	ax.hist(weights_array,bins=100)
-	plt.text(0.5, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
-	plt.text(0.5, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.5, 0.80, "num="+str(len(euclid_index)), transform=ax.transAxes)
+	plt.text(0.8, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
+	plt.text(0.8, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "num="+str(len(euclid_index)), transform=ax.transAxes)
 	plt.xlim([weights_array.min(),weights_array.max()])
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"euclid_index.png"))

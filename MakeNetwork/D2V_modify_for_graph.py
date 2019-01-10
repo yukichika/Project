@@ -148,8 +148,7 @@ if __name__ == "__main__":
 		with open(os.path.join(nx_dir_new,"all_node_weights_cos_sim.gpkl"),'w') as fo:
 			pickle.dump(all_node_weights,fo)
 
-
-
+		"""ファイルの読み込み"""
 		with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'r') as fi:
 			G_ = pickle.load(fi)
 
@@ -162,6 +161,7 @@ if __name__ == "__main__":
 				q_dst = doc2vec_vectors[link_node_no]
 				weight = euclid(p_dst,q_dst)
 				weight = (weight - min_euclid)/(max_euclid - min_euclid)#0~1に正規化
+				weight = 1 - weight#ユークリッド距離を反転
 				if weight == 0:
 					weight = 0.001
 				edges[node_no][link_node_no]["weight"] = weight
@@ -177,6 +177,7 @@ if __name__ == "__main__":
 				q_dst = doc2vec_vectors[j_node]
 				weight = euclid(p_dst,q_dst)
 				weight = (weight - min_euclid)/(max_euclid - min_euclid)#0~1に正規化
+				weight = 1 - weight#ユークリッド距離を反転
 				if weight == 0:
 					weight = 0.001
 				all_node_weights_[i,j] = weight#自分自身との類似度は1を超えるが，使用しないため問題なし
