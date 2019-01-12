@@ -519,7 +519,7 @@ def main(args):
 
 		"lamb":0.5,
 
-		"node_type":"REPR",
+		"node_type":"COMP1",
 		"cmap":"jet",
 		"lumine":200,
 		"color_map_by":"theta",

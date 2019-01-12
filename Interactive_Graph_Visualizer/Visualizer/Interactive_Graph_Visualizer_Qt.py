@@ -496,10 +496,10 @@ def main(args):
 
 	params["draw_option"] = {
 		#力学モデル
-		# "weight_type":[],
+		"weight_type":[],
 
 		#力学モデル+doc2vec
-		"weight_type":["ATTR","REPUL"],
+		# "weight_type":["ATTR","REPUL"],
 
 		#力学モデル+doc2vec+HITS(auth_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
@@ -521,9 +521,9 @@ def main(args):
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		"lamb":0.25,
+		"lamb":0.75,
 
-		"node_type":"kmeans3_j",
+		"node_type":"kmeans100_j",
 		"cmap":"jet",
 		"lumine":200,
 		"color_map_by":"vector1",

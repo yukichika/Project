@@ -80,6 +80,7 @@ if __name__ == "__main__":
 	cos_norm = []#コサイン類似度正規化(0~1)
 	euclid_ = []#ユークリッド距離
 	euclid_norm = []#ユークリッド距離正規化(0~1)
+	euclid_norm_reverse = []#反転させたユークリッド距離正規化(0~1)
 	euclid_index = []#指数で正規化したユークリッド距離
 
 	comp_func_name = inifile.get('nx','comp_func_name')
@@ -123,6 +124,8 @@ if __name__ == "__main__":
 				weight_euclid = euclid(p_dst,q_dst)
 				weight_euclid = (weight_euclid - min_euclid)/(max_euclid - min_euclid)#0~1に正規化
 				euclid_norm.append(weight_euclid)
+				weight_euclid_reverse = 1 - weight_euclid
+				euclid_norm_reverse.append(weight_euclid_reverse)
 
 
 	"""weight（全ノード間の距離）のヒストグラム作成（コサイン類似度）"""
@@ -132,7 +135,7 @@ if __name__ == "__main__":
 	ax.hist(weights_array,bins=100)
 	plt.text(0.8, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
 	plt.text(0.8, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.8, 0.80, "num="+str(len(cos)), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "total="+str(len(cos)), transform=ax.transAxes)
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"cos.png"))
 
@@ -143,7 +146,7 @@ if __name__ == "__main__":
 	ax.hist(weights_array,bins=100)
 	plt.text(0.8, 0.9, "max="+"{0:.3f}".format(weights_array.max()), transform=ax.transAxes)
 	plt.text(0.8, 0.85, "min="+"{0:.3g}".format(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.8, 0.80, "num="+str(len(cos_norm)), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "total="+str(len(cos_norm)), transform=ax.transAxes)
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"cos_norm.png"))
 
@@ -154,7 +157,7 @@ if __name__ == "__main__":
 	ax.hist(weights_array,bins=100)
 	plt.text(0.8, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
 	plt.text(0.8, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.8, 0.80, "num="+str(len(euclid_)), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "total="+str(len(euclid_)), transform=ax.transAxes)
 	plt.xlim([weights_array.min(),weights_array.max()])
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"euclid.png"))
@@ -166,10 +169,22 @@ if __name__ == "__main__":
 	ax.hist(weights_array,bins=100)
 	plt.text(0.8, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
 	plt.text(0.8, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.8, 0.80, "num="+str(len(euclid_norm)), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "total="+str(len(euclid_norm)), transform=ax.transAxes)
 	plt.xlim([weights_array.min(),weights_array.max()])
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"euclid_norm.png"))
+
+	"""weight（全ノード間の距離）のヒストグラム作成（反転させた正規化したユークリッド距離）"""
+	fig_w = plt.figure()
+	ax = fig_w.add_subplot(1,1,1)
+	weights_array = np.array(euclid_norm_reverse,dtype=np.float)
+	ax.hist(weights_array,bins=100)
+	plt.text(0.8, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
+	plt.text(0.8, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "total="+str(len(euclid_norm_reverse)), transform=ax.transAxes)
+	plt.xlim([weights_array.min(),weights_array.max()])
+	fig_w.show()
+	fig_w.savefig(os.path.join(check_dir,"euclid_norm_reverse.png"))
 
 	"""weight（全ノード間の距離）のヒストグラム作成（指数で正規化したユークリッド距離）"""
 	fig_w = plt.figure()
@@ -178,7 +193,7 @@ if __name__ == "__main__":
 	ax.hist(weights_array,bins=100)
 	plt.text(0.8, 0.9, "max="+str(weights_array.max()), transform=ax.transAxes)
 	plt.text(0.8, 0.85, "min="+str(weights_array.min()), transform=ax.transAxes)
-	plt.text(0.8, 0.80, "num="+str(len(euclid_index)), transform=ax.transAxes)
+	plt.text(0.8, 0.80, "total="+str(len(euclid_index)), transform=ax.transAxes)
 	plt.xlim([weights_array.min(),weights_array.max()])
 	fig_w.show()
 	fig_w.savefig(os.path.join(check_dir,"euclid_index.png"))

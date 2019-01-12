@@ -146,7 +146,7 @@ if __name__ == "__main__":
 				src_json_dict = json.load(fj)
 			src_title = src_json_dict.get("title","")
 
-			f_cos.write(src_title.encode("utf-8") + ":" + str(c[1]) + "\n")
+			f_cos.write(str(c[0]) + " " + src_title.encode("utf-8") + ":" + str(c[1]) + "\n")
 			if i+1 == topn:
 				break
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 				src_json_dict = json.load(fj)
 			src_title = src_json_dict.get("title","")
 
-			f_euclid.write(src_title.encode("utf-8") + ":" + str(e[1]) + "\n")
+			f_euclid.write(str(e[0]) + " " + src_title.encode("utf-8") + ":" + str(e[1]) + "\n")
 			if j+1 == topn:
 				break
 
@@ -168,6 +168,6 @@ if __name__ == "__main__":
 				src_json_dict = json.load(fj)
 			src_title = src_json_dict.get("title","")
 
-			f_euclid_index.write(src_title.encode("utf-8") + ":" + str(e_index[1]) + "\n")
+			f_euclid_index.write(str(e_index[0]) + " " + src_title.encode("utf-8") + ":" + str(e_index[1]) + "\n")
 			if k+1 == topn:
 				break
