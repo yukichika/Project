@@ -25,6 +25,8 @@ sys.path.append("../MyPythonModule")
 from LDA_kai import LDA
 sys.path.append("../Interactive_Graph_Visualizer/Interactive_Graph_Visualizer")
 import LDA_PCA
+sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
+import networkx as nx
 
 def cvtRGBAflt2HTML(rgba):
 	if isinstance(rgba, tuple):
@@ -37,7 +39,7 @@ col_conv = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 def convert_to_excelpos(row,col):
 	return col_conv[col] + unicode(row+1)
 
-def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_dir=None,G_path=None,G_path_new=None):
+def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=None,G_path=None,G_path_new=None):
 	sheet = book.add_worksheet("collection analize")
 
 	draw_topics_flag = False
@@ -61,22 +63,23 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 		cmap = cm.jet_r
 		# cmap = cm.jet
 
-	if "pca_d2v" in tgt_params:
-		vecs = [d2v[x] for x in d2v.keys()]
-		pca = decomposition.PCA(1)
-		pca.fit(vecs)
-		vecs_pca = pca.transform(vecs)
-		reg_vecs_pca = (vecs_pca-vecs_pca.min())/(vecs_pca.max()-vecs_pca.min())#0~1に正規化
-		cmap = cm.jet_r
-		# cmap = cm.jet
-
-	if "kmeans100" in tgt_params:
+	if "kmeans100_j" in tgt_params:
 		with open(os.path.join(root_dir,G_path_new)) as fi:
 			G_new = pickle.load(fi)
+		k100_dict = nx.get_node_attributes(G_new,"kmeans_100")
+		k100 = np.array(k100_dict.values())
+		k100 = k100.astype("float32")
+		k100 = (k100-k100.min())/(k100.max()-k100.min())
+		c_map = cm.jet_r
 
-	if "kmeans3" in tgt_params:
+	if "kmeans3_j" in tgt_params:
 		with open(os.path.join(root_dir,G_path_new)) as fi:
 			G_new = pickle.load(fi)
+		k3_dict = nx.get_node_attributes(G_new,"kmeans_3")
+		k3 = np.array(k3_dict.values())
+		k3 = k3.astype("float32")
+		k3 = (k3-k3.min())/(k3.max()-k3.min())
+		c_map = cm.jet_r
 
 	"""1行目（項目名)の追加"""
 	for i,param in enumerate(tgt_params):
@@ -146,19 +149,14 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 				c_format = book.add_format()
 				#c_format.set_pattern(1)
 				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
-			elif param == "pca_d2v":
-				val = float(reg_vecs_pca[i])
+			elif param == "kmeans100_j":
+				val = float(k100[i])
 				c_format = book.add_format()
-				#c_format.set_pattern(1)
 				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
-			elif param == "kmeans100":
-				val = G_new.node.get(file_no).get("kmeans_100",-1)
+			elif param == "kmeans3_j":
+				val = float(k3[i])
 				c_format = book.add_format()
-				c_format.set_bg_color(G_new.node.get(file_no).get("color_k100",-1))
-			elif param == "kmeans3":
-				val = G_new.node.get(file_no).get("kmeans_3",-1)
-				c_format = book.add_format()
-				c_format.set_bg_color(G_new.node.get(file_no).get("color_k3",-1))
+				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
 			else:
 				val = node.get(param)
 
@@ -250,13 +248,13 @@ def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
 	"""ファイルの読み込み"""
 	with open(os.path.join(exp_dir,"instance.pkl")) as fi:
 	   lda = pickle.load(fi)
-	with open(os.path.join(new_exp_dir,"doc2vec.pkl")) as fi:
-	   d2v = pickle.load(fi)
+	# with open(os.path.join(new_exp_dir,"doc2vec.pkl")) as fi:
+	#    d2v = pickle.load(fi)
 
 	##book=xlwt.Workbook()
 	book = xlsxwriter.Workbook(os.path.join(new_exp_dir,save_name))
 	"""Webページの情報"""
-	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_dir=pie_dir,G_path=G_path,G_path_new=G_path_new)
+	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=pie_dir,G_path=G_path,G_path_new=G_path_new)
 	"""トピック毎の単語分布"""
 	create_topic_words(book,lda,top_n=top_n,word_only=True)
 	book.close()
@@ -300,7 +298,7 @@ if __name__=="__main__":
 	size = int(inifile.get('d2v','size'))
 	new_exp_name = "D" + unicode(size) + suffix_generator(target,is_largest)
 
-	save_name = "collection_datas_d2v_2.xlsx"
+	save_name = "collection_datas_d2v_3.xlsx"
 	top_n = 20
 
 	tgt_params = [
@@ -318,9 +316,8 @@ if __name__=="__main__":
 		"hits",#HITSスコア
 		"topics",#トピック分布
 		"pca_lda",#LDAの主成分分析
-		"pca_d2v",#D2Vの主成分分析
-		"kmeans100",#100次元でのクラスタリング
-		"kmeans3"#3次元でのクラスタリング
+		"kmeans100_j",#100次元でのクラスタリング
+		"kmeans3_j"#3次元でのクラスタリング
 		]
 
 	main(root_dir=root_dir,expname=exp_name,newexpname=new_exp_name,tgt_params=tgt_params,save_name=save_name,top_n=top_n)
