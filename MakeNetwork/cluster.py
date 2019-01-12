@@ -83,13 +83,18 @@ if __name__ == "__main__":
 
 			n_clusters = 10
 			"""ベクトルの次元数を保持したままクラスタリング"""
+			print("-----ベクトルの次元数を保持したままクラスタリング-----")
 			kmeans = KMeans(n_clusters=n_clusters,random_state=0).fit(data_array)
 			pred = kmeans.labels_
+			center_100 = kmeans.cluster_centers_
 			# print(kmeans.cluster_centers_)
+			center_100_dict = {}
+			for i,c_100 in enumerate(center_100):
+				center_100_dict[i] = c_100
+			# print(center_100_dict)
 
 			u, c = np.unique(pred,return_counts=True)
 			result_sum = dict(zip(u, c))
-			print("-----ベクトルの次元数を保持したままクラスタリング-----")
 			print(result_sum)
 
 			with open(os.path.join(nx_dir_new,"kmeans_n" + str(n_clusters) + "_d" + str(len(doc2vec_vectors[0])) + ".txt"),'w') as fo:
@@ -98,13 +103,18 @@ if __name__ == "__main__":
 					fo.write(str(k) + ":" + str(v) + "\n")
 
 			"""ベクトルの次元数を主成分分析で圧縮してクラスタリング"""
+			print("-----ベクトルの次元数を主成分分析で圧縮してクラスタリング-----")
 			kmeans_pca = KMeans(n_clusters=n_clusters,random_state=0).fit(data_array_pca)
 			pred_pca = kmeans_pca.labels_
+			center_3 = kmeans_pca.cluster_centers_
 			# print(kmeans_pca.cluster_centers_)
+			center_3_dict = {}
+			for i,c_3 in enumerate(center_3):
+				center_3_dict[i] = c_3
+			# print(center_3_dict)
 
 			u, c = np.unique(pred_pca,return_counts=True)
 			result_sum = dict(zip(u, c))
-			print("-----ベクトルの次元数を主成分分析で圧縮してクラスタリング-----")
 			print(result_sum)
 
 			with open(os.path.join(nx_dir_new,"kmeans_n" + str(n_clusters) + "_d" + str(len(data_array_pca[0])) + ".txt"),'w') as fo:
@@ -134,3 +144,8 @@ if __name__ == "__main__":
 				pickle.dump(G,fo)
 			with open(os.path.join(nx_dir_new,"G_with_params_euclid.gpkl"),'w') as fo:
 				pickle.dump(G_euc,fo)
+
+			with open(os.path.join(nx_dir_new,"kmeans_n" + str(n_clusters) + "_d" + str(len(doc2vec_vectors[0])) + ".pkl"),'w') as fo:
+				pickle.dump(center_100_dict,fo)
+			with open(os.path.join(nx_dir_new,"kmeans_n" + str(n_clusters) + "_d" + str(len(data_array_pca[0])) + ".pkl"),'w') as fo:
+				pickle.dump(center_3_dict,fo)

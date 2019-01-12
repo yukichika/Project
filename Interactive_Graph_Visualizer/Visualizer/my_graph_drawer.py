@@ -170,42 +170,42 @@ def get_color_map_vector1(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
 			color_map[node_no] = cvtRGBAflt2HTML(c_map(reg_d2v_pca[d2v_no]))#（R,G,B）=>16進数のカラーコード
 	return color_map
 
-# def cvtRGBAflt2HTML_3D(rgba):
-# 	rgb = []
-# 	rgb.append(rgba[0][0])
-# 	rgb.append(rgba[1][1])
-# 	rgb.append(rgba[2][2])
-# 	rgb = np.array(rgb)
-# 	rgb_uint = (rgb*255).astype(np.uint8)
-# 	return LDA_PCA.cvtRGB_to_HTML(rgb_uint)
-#
-# reg_d2v_pca = 0
-# def get_color_map_vector3(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
-# 	global reg_d2v_pca
-# 	"""doc2vecのベクトルの方を主成分分析で3次元にして彩色"""
-# 	vector = d2v.values()
-# 	pca = decomposition.PCA(3)
-# 	pca.fit(vector)
-# 	d2v_pca = pca.transform(vector)
-# 	reg_d2v_pca = (d2v_pca-d2v_pca.min())/(d2v_pca.max()-d2v_pca.min())#0~1に正規化
-#
-# 	"""寄与率計算のため，再度PCA"""
-# 	pca2 = decomposition.PCA(len(d2v.values()[0]))
-# 	pca2.fit(vector)
-# 	print pca2.explained_variance_ratio_
-#
-# 	if cmap == "jet":
-# 		# c_map = cm.jet
-# 		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
-# 		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
-# 		color_map = {}
-# 		for serial_no,node_no in enumerate(G.node.keys()):
-# 			d2v_no = file_id_dict_inv.get(node_no)
-# 			if d2v_no == None:
-# 				color_map[node_no] = r"#FFFFFF"
-# 				continue
-# 			color_map[node_no] = cvtRGBAflt2HTML_3D(c_map(reg_d2v_pca[d2v_no]))
-# 	return color_map
+def cvtRGBAflt2HTML_3D(rgba):
+	rgb = []
+	rgb.append(rgba[0][0])
+	rgb.append(rgba[1][1])
+	rgb.append(rgba[2][2])
+	rgb = np.array(rgb)
+	rgb_uint = (rgb*255).astype(np.uint8)
+	return LDA_PCA.cvtRGB_to_HTML(rgb_uint)
+
+reg_d2v_pca = 0
+def get_color_map_vector3(G,pos,d2v,comp_type="COMP1",lumine=255,cmap="lch"):
+	global reg_d2v_pca
+	"""doc2vecのベクトルの方を主成分分析で3次元にして彩色"""
+	vector = d2v.values()
+	pca = decomposition.PCA(3)
+	pca.fit(vector)
+	d2v_pca = pca.transform(vector)
+	reg_d2v_pca = (d2v_pca-d2v_pca.min())/(d2v_pca.max()-d2v_pca.min())#0~1に正規化
+
+	"""寄与率計算のため，再度PCA"""
+	pca2 = decomposition.PCA(len(d2v.values()[0]))
+	pca2.fit(vector)
+	print pca2.explained_variance_ratio_
+
+	if cmap == "jet":
+		# c_map = cm.jet
+		c_map = cm.jet_r#環境によってPCAの値が反転する？ため，カラーマップを反転させて対応
+		file_id_dict_inv = {v:i for i, v in enumerate(d2v.keys())}
+		color_map = {}
+		for serial_no,node_no in enumerate(G.node.keys()):
+			d2v_no = file_id_dict_inv.get(node_no)
+			if d2v_no == None:
+				color_map[node_no] = r"#FFFFFF"
+				continue
+			color_map[node_no] = cvtRGBAflt2HTML_3D(c_map(reg_d2v_pca[d2v_no]))
+	return color_map
 
 def draw_node_with_lch(G,pos,**kwargs):
 	d2v = kwargs.get("d2v")
@@ -222,8 +222,8 @@ def draw_node_with_lch(G,pos,**kwargs):
 
 	if color_map_by == "vector1":#主成分分析の対象がdoc2vecのベクトルで，1次元に主成分分析
 		color_map = get_color_map_vector1(G,pos,d2v,comp_type,lumine=lumine,cmap=cmap)
-	# elif color_map_by == "vector3":#主成分分析の対象がdoc2vecのベクトルで，3次元に主成分分析
-	# 	color_map = get_color_map_vector3(G,pos,d2v,comp_type,lumine=lumine,cmap=cmap)
+	elif color_map_by == "vector3":#主成分分析の対象がdoc2vecのベクトルで，3次元に主成分分析
+		color_map = get_color_map_vector3(G,pos,d2v,comp_type,lumine=lumine,cmap=cmap)
 	elif color_map_by == None:#無色
 		color_map = dict.fromkeys(G,"#FFFFFF")
 
@@ -243,6 +243,7 @@ def draw_network(G,pos,**kwargs):
 	color_map = None
 	if node_type == "COMP1":#doc2vecのベクトルを主成分分析で可視化
 		node_collection,color_map = draw_node_with_lch(G,pos,**kwargs)
+		print(1)
 	elif node_type == "kmeans100_j":
 		k100_dict = nx.get_node_attributes(G,"kmeans_100")
 		k100 = np.array(k100_dict.values())
@@ -450,7 +451,6 @@ def collect_adjacents(G,node_no,link_type):
 
 	return set(ret_list),edges
 
-
 """
 change adjacents color to white and hide edges
 @arg
@@ -558,92 +558,3 @@ def node_crawler(G,**kwargs):
 
 	node_collection = graph_redraw(G,_color_map=new_color_map,edgelist=edges)
 	return node_collection
-
-"""保存名の決定（root_dir）"""
-def suffix_generator_root(search_word,max_page,add_childs,append):
-	suffix = "_" + search_word
-	suffix += "_" + unicode(max_page)
-	if add_childs:
-		suffix += "_add_childs"
-	if append:
-		suffix += "_append"
-	return suffix
-
-"""保存名の決定"""
-def suffix_generator(target=None,is_largest=False):
-	suffix = ""
-	if target != None:
-		suffix += "_"+target
-	if is_largest == True:
-		suffix += "_largest"
-	return suffix
-
-if __name__ == "__main__":
-	params = {}
-	params["search_word"] = u"Test"
-	params["max_page"] = 10
-	add_childs = True
-	append = False
-	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
-	params["root_dir"] = save_dir + suffix_generator_root(params["search_word"],params["max_page"],add_childs,append)
-
-	params["is_largest"] = True
-	params["target"] = "myexttext"
-
-	params["K"] = 10
-	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
-	params["comp_func_name"] = "comp4_2"
-
-	params["size"] = 100
-	params["exp_name_new"] = "D" + unicode(params["size"]) + suffix_generator(params["target"],params["is_largest"])
-	params["comp_func_name_new"] = "cos_sim"
-
-	# params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
-	# params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
-	# params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
-
-	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name_new"]),"nx_datas")
-	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name_new"] + ".gpkl"
-	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name_new"] + ".gpkl"
-
-	params["draw_option"] = {
-		"weight_type":[],
-
-		# "weight_type":["ATTR","REPUL"],
-
-		# "weight_type":["ATTR","REPUL","HITS"],
-		# "weight_attr":{"type":"a_score","min":1,"max":3},
-		# "size_attr":{"type":"a_score","min":1000,"max":5000},
-
-		# "weight_type":["ATTR","REPUL","HITS"],
-		# "weight_attr":{"type":"h_score","min":1,"max":3},
-		# "size_attr":{"type":"h_score","min":1000,"max":5000},
-
-		# "weight_type":["ATTR","REPUL","BHITS"],
-		# "weight_attr":{"type":"a_score","min":1,"max":3},
-		# "size_attr":{"type":"a_score","min":1000,"max":5000},
-
-		# "weight_type":["ATTR","REPUL","BHITS"],
-		# "weight_attr":{"type":"h_score","min":1,"max":3},
-		# "size_attr":{"type":"h_score","min":1000,"max":5000},
-
-		"lamb":0.5,
-
-		"node_type":"COMP1",
-		"cmap":"jet",
-		"lumine":200,
-		"color_map_by":"vector",
-
-		"pos_rand_path":"nest1.rand",
-		"do_rescale":True,
-		"with_label":False,
-		"add_random_move":False
-		}
-
-	main(params)
-	# ax = plt.figure().add_subplot(111)
-	# draw_option["ax"] = ax
-	# params["draw_option"] = draw_option
-	# main(params)
-	# #ax.get_figure().show()
-	# plt.show()

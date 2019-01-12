@@ -17,7 +17,8 @@ scipy 0.19.0
 
 ## How to Use
 Interactive_Graph_Visualizer_Qt.pyを使用．  
-PyQt4をベースに実装．パラメータはmain文で指定．  
+PyQt4をベースに実装．（LDAの結果を反映させた配置）  
+パラメータはmain文で指定．  
 
 基本操作  
 ```

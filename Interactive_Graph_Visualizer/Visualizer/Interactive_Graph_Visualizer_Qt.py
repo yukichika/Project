@@ -523,7 +523,7 @@ def main(args):
 
 		"lamb":0.75,
 
-		"node_type":"kmeans100_j",
+		"node_type":"kmeans3_j",
 		"cmap":"jet",
 		"lumine":200,
 		"color_map_by":"vector1",

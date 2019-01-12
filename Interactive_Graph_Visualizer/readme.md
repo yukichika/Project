@@ -6,7 +6,7 @@
 LDAの結果を用いる．  
 
 ・Visualizer  
-Interactive_Graph_VisualizerをDoc2vec用に書き換えたスクリプト．  
+Interactive_Graph_Visualizerをdoc2vec用に書き換えたスクリプト．  
 
 networkx-master  
 networkxのソース．(versionは不明)  

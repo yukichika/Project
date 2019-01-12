@@ -18,7 +18,7 @@ Crawler.py→My_extract_content.py→After_crawled_arrange.pyの順に回す．
 
 ・Crawler.py  
 Webページの収集と，リンク先の取得．（検索パラメータは設定ファイルで指定）  
-構造上，リンク先の情報は1段階のみ取得可能である点に注意．  
+※構造上，リンク先の情報は1段階のみ取得可能である点に注意．  
 
 ・My_extract_content.py  
 本文の抽出と，不要なタグを取り除いたhtmlの保存.  
@@ -26,7 +26,10 @@ Webページの収集と，リンク先の取得．（検索パラメータは設定ファイルで指定）
 ・After_crawled_arrange.py  
 内部リンクと外部リンクの判定．  
 Crawler.pyでも内部・外部リンクを指定して収集しているが，収集したページのドメインを定義しなおし，再選定を行う．  
-あくまで，収集した結果から減らしていくことしか出来ない点に注意．  
+※あくまで，収集した結果から減らしていくことしか出来ない点に注意．  
+
+・Mymodule.py  
+MyPythonModule/mymodule.pyをpython3に書き換えたもの．  
 
 ## 取得一覧
 ・Pages（jsonファイル） 
