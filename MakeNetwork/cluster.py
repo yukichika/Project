@@ -11,6 +11,7 @@ from tqdm import tqdm
 from sklearn.cluster import KMeans
 from sklearn import decomposition
 import matplotlib.cm as cm
+import matplotlib.pyplot as plt
 
 import sys
 sys.path.append("../MyPythonModule")

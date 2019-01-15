@@ -11,12 +11,18 @@ from tqdm import tqdm
 from sklearn.cluster import KMeans
 from sklearn import decomposition
 import matplotlib.cm as cm
+import itertools
 
 import sys
 sys.path.append("../MyPythonModule")
 import mymodule
 sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
 import networkx as nx
+
+"""ユークリッド距離"""
+def euclid(p,q):
+	weight = np.sqrt(np.power(p-q,2).sum())
+	return weight
 
 """保存名の決定（root_dir）"""
 def suffix_generator_root(search_word,max_page,add_childs,append):
@@ -67,10 +73,25 @@ if __name__ == "__main__":
 		with open(os.path.join(nx_dir_new,"G_with_params_euclid.gpkl"),'rb') as fi:
 			G_euc = pickle.load(fi)
 
-		with open(os.path.join(exp_dir_new,"kmeans_n10_d100.pkl"),'rb') as fi:
+		with open(os.path.join(nx_dir_new,"kmeans_n10_d100.pkl"),'rb') as fi:
 			dict_100 = pickle.load(fi)
-		with open(os.path.join(exp_dir_new,"kmeans_n10_d3.pkl"),'rb') as fi:
+		with open(os.path.join(nx_dir_new,"kmeans_n10_d3.pkl"),'rb') as fi:
 			dict_3 = pickle.load(fi)
 
-		print(dict_100)
-		print(G.node[0])
+		"""ターゲットを定めてソート"""
+		target = 0
+		distance_list = []
+		for i in dict_100.keys():
+			if not i == target:
+				distance = euclid(dict_100[target],dict_100[i])
+				distance_list.append([i,distance])
+
+		distance_list = sorted(distance_list,key=lambda x: x[1],reverse=False)
+
+		"""全組み合わせ"""
+		# distance_list = []
+		# for comb in list(itertools.combinations(dict_100.keys(),2)):
+		# 	distance = euclid(dict_100[comb[0]],dict_100[comb[1]])
+		# 	distance_list.append([(comb[0],comb[1]),distance])
+		# distance_list = sorted(distance_list,key=lambda x: x[1],reverse=False)
+		# print(distance_list)
