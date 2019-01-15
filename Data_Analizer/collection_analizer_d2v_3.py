@@ -1,13 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-収集したデータをエクセルで分析するためにxlsxwriterを使ってxlsx出力
-基本的にjsonのデータを出力するが，LDAで推定した代表トピックも出力する．
-トピックの上位単語も解析したいので別シートにトピックごとの単語を出力
-PCAで着色した結果とも比較するため，PCA後の値とその色も出力
-"""
-
 import os
 import cPickle as pickle
 import json
@@ -89,20 +82,15 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 		for i in range(lda.K):
 			sheet.write(0,last_col+i+1,"Topic"+unicode(i+1))#一つスペースを空け，そこにグラフを挿入する
 
-	#in_domain_titles={}
 	file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}#ファイル名とLDAでの文書番号(逆引き)．LDAの方に作っとけばよかった．．．
 	theta = lda.theta()
-	#for id in xrange(len(lda.docs)):
 	for i,file_no in enumerate(G.node.keys()):#全ての除去工程を経た結果がGに入っているため，ここから逆引きするほうが楽
 		"""ファイル番号を取得してjson取得"""
 		with open(os.path.join(src_pages_dir,unicode(file_no)+".json"),"r") as fj:
 			node = json.load(fj)
 		id = file_id_dict_inv[file_no]
 		tgt_row = i+1
-		#file_no=lda.file_id_dict[id]
 
-		#if domain not in in_domain_titles.keys():
-		#	in_domain_titles[domain]=set()
 		for j,param in enumerate(tgt_params):
 			val = 0
 			c_format = None
@@ -113,9 +101,6 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 			elif param == "domain":
 				url = node.get("url")
 				val = url.split("/")[2]
-				#if title not in in_domain_titles[domain]:
-				#	count=1
-				#	in_domain_titles[domain].add(title)
 			elif param == "len(text)":
 				if(node.get("text") != None):
 					val = len(node.get("text"))
@@ -162,39 +147,6 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 
 			sheet.write(tgt_row,j,val,c_format)
 
-			if draw_topics_flag == True:
-				for k in range(lda.K):
-					sheet.write(tgt_row,last_col+k+1,theta[id,k])
-				# sheet.add_sparkline(convert_to_excelpos(tgt_row,last_col), {'range':convert_to_excelpos(tgt_row,last_col+1)+":"+convert_to_excelpos(tgt_row,last_col+1+lda.K),
-				# 							               'type': 'column',
-				# 							               'style': 12})
-
-def create_topic_words(book,lda,top_n=20,word_only=False):
-	sheet = book.add_worksheet("topics")
-
-	step = 2
-	c_format = book.add_format({"right":True})
-
-	phi = lda.phi()
-
-	if word_only == True:
-		for k in xrange(lda.K):
-			word_col = k
-			sheet.write(0,word_col,"Topic"+unicode(k+1),c_format)
-			for i,w in enumerate(np.argsort(-phi[k])[:top_n],start=1):
-				# sheet.write(i,word_col,unicode(lda.vocas[w]),c_format)
-				sheet.write(i,word_col,lda.vocas[w].decode("utf-8"),c_format)
-	else:
-		for k in xrange(lda.K):
-			word_col = k*step
-			prob_col = word_col+1
-
-			sheet.write(0,word_col,"Topic"+unicode(k+1))
-			sheet.write(0,prob_col,"",c_format)
-			for i,w in enumerate(np.argsort(-phi[k])[:top_n],start=1):
-				sheet.write(i,word_col,unicode(lda.vocas[w]))
-				sheet.write(i,prob_col,phi[k,w],c_format)
-
 def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
 	"""関連フォルダの存在確認"""
 	if not os.path.exists(root_dir):
@@ -235,9 +187,8 @@ def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
 	G_path_new = None
 	if "hits" in tgt_params:
 		nx_dir_new = os.path.join(new_exp_dir,"nx_datas")
-		# G_path_new = glob.glob(nx_dir_new+"/G*gpkl")[0]
-		G_path_new = os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl")
-		# G_path_new = os.path.join(nx_dir_new,"G_with_params_euclid.gpkl")
+		# G_path_new = os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl")
+		G_path_new = os.path.join(nx_dir_new,"G_with_params_euclid.gpkl")
 		if not os.path.exists(G_path_new):
 			print "G",G_path_new,"is not exist"
 			exit()
@@ -248,16 +199,10 @@ def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
 	"""ファイルの読み込み"""
 	with open(os.path.join(exp_dir,"instance.pkl")) as fi:
 	   lda = pickle.load(fi)
-	# with open(os.path.join(new_exp_dir,"doc2vec.pkl")) as fi:
-	#    d2v = pickle.load(fi)
 
-	##book=xlwt.Workbook()
 	book = xlsxwriter.Workbook(os.path.join(new_exp_dir,save_name))
 	"""Webページの情報"""
 	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=pie_dir,G_path=G_path,G_path_new=G_path_new)
-	"""トピック毎の単語分布"""
-	create_topic_words(book,lda,top_n=top_n,word_only=True)
-	book.close()
 
 """保存名の決定（root_dir）"""
 def suffix_generator_root(search_word,max_page,add_childs,append):
@@ -314,7 +259,6 @@ if __name__=="__main__":
 		"to_ext_links",#["to_ext_links"]の数
 		"repTopic",#代表トピック
 		"hits",#HITSスコア
-		"topics",#トピック分布
 		"pca_lda",#LDAの主成分分析
 		"kmeans100_j",#100次元でのクラスタリング
 		"kmeans3_j"#3次元でのクラスタリング

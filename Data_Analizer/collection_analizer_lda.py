@@ -26,6 +26,7 @@ from LDA_kai import LDA
 sys.path.append("../Interactive_Graph_Visualizer/Interactive_Graph_Visualizer")
 import LDA_PCA
 sys.path.append("../Interactive_Graph_Visualizer/networkx-master")
+import networkx as nx
 
 def cvtRGBAflt2HTML(rgba):
 	if isinstance(rgba, tuple):
@@ -70,20 +71,15 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 		for i in range(lda.K):
 			sheet.write(0,last_col+i+1,"Topic"+unicode(i+1))#一つスペースを空け，そこにグラフを挿入する
 
-	#in_domain_titles={}
 	file_id_dict_inv = {v:k for k, v in lda.file_id_dict.items()}#ファイル名とLDAでの文書番号(逆引き)．LDAの方に作っとけばよかった．．．
 	theta = lda.theta()
-	#for id in xrange(len(lda.docs)):
 	for i,file_no in enumerate(G.node.keys()):#全ての除去工程を経た結果がGに入っているため，ここから逆引きするほうが楽
 		"""ファイル番号を取得してjson取得"""
 		with open(os.path.join(src_pages_dir,unicode(file_no)+".json"),"r") as fj:
 			node = json.load(fj)
 		id = file_id_dict_inv[file_no]
 		tgt_row = i+1
-		#file_no = lda.file_id_dict[id]
 
-		#if domain not in in_domain_titles.keys():
-		#	in_domain_titles[domain] = set()
 		for j,param in enumerate(tgt_params):
 			val = 0
 			c_format = None
@@ -94,9 +90,6 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 			elif param == "domain":
 				url = node.get("url")
 				val = url.split("/")[2]
-				#if title not in in_domain_titles[domain]:
-				#	count=1
-				#	in_domain_titles[domain].add(title)
 			elif param == "len(text)":
 				if(node.get("text") != None):
 					val = len(node.get("text"))
@@ -128,7 +121,6 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 			elif param == "pca_lda":
 				val = float(reg_theta_pca[id])
 				c_format = book.add_format()
-				#c_format.set_pattern(1)
 				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
 			else:
 				val = node.get(param)
@@ -138,9 +130,7 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 			if draw_topics_flag == True:
 				for k in range(lda.K):
 					sheet.write(tgt_row,last_col+k+1,theta[id,k])
-				sheet.add_sparkline(convert_to_excelpos(tgt_row,last_col), {'range':convert_to_excelpos(tgt_row,last_col+1)+":"+convert_to_excelpos(tgt_row,last_col+1+lda.K),
-											               'type': 'column',
-											               'style': 12})
+				sheet.add_sparkline(convert_to_excelpos(tgt_row,last_col), {'range':convert_to_excelpos(tgt_row,last_col+1)+":"+convert_to_excelpos(tgt_row,last_col+1+lda.K),'type': 'column','style': 12})
 
 def create_topic_words(book,lda,top_n=20,word_only=False):
 	sheet = book.add_worksheet("topics")
