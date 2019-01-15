@@ -12,4 +12,3 @@ Interactive_Graph_Visualizer(python2)
 MyPythonModule(python2)  
 
 Notebook(jupyter notebook)  
-コード確認用．  
