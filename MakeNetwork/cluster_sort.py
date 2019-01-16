@@ -24,6 +24,11 @@ def euclid(p,q):
 	weight = np.sqrt(np.power(p-q,2).sum())
 	return weight
 
+"""ベクトルのノルム"""
+def norm(p):
+	vec_norm = np.linalg.norm(p)
+	return vec_norm
+
 """保存名の決定（root_dir）"""
 def suffix_generator_root(search_word,max_page,add_childs,append):
 	suffix = "_" + search_word
@@ -68,6 +73,8 @@ if __name__ == "__main__":
 		print("D2V modify not finished.")
 	else:
 		"""ファイルの読み込み"""
+		with open(os.path.join(exp_dir_new,"doc2vec.pkl"),'rb') as fi:
+			doc2vec_vectors = pickle.load(fi)
 		with open(os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl"),'rb') as fi:
 			G = pickle.load(fi)
 		with open(os.path.join(nx_dir_new,"G_with_params_euclid.gpkl"),'rb') as fi:
@@ -79,14 +86,14 @@ if __name__ == "__main__":
 			dict_3 = pickle.load(fi)
 
 		"""ターゲットを定めてソート"""
-		target = 0
-		distance_list = []
-		for i in dict_100.keys():
-			if not i == target:
-				distance = euclid(dict_100[target],dict_100[i])
-				distance_list.append([i,distance])
-
-		distance_list = sorted(distance_list,key=lambda x: x[1],reverse=False)
+		# target = 0
+		# distance_list = []
+		# for i in dict_100.keys():
+		# 	if not i == target:
+		# 		distance = euclid(dict_100[target],dict_100[i])
+		# 		distance_list.append([i,distance])
+		#
+		# distance_list = sorted(distance_list,key=lambda x: x[1],reverse=False)
 
 		"""全組み合わせ"""
 		# distance_list = []
@@ -95,3 +102,29 @@ if __name__ == "__main__":
 		# 	distance_list.append([(comb[0],comb[1]),distance])
 		# distance_list = sorted(distance_list,key=lambda x: x[1],reverse=False)
 		# print(distance_list)
+
+		"""原点からの距離（ノルム）に応じてソート"""
+		# distance_list = []
+		# for k,v in dict_100.items():
+		# 	norm_vec = norm(v)
+		# 	distance_list.append([k,norm_vec])
+		#
+		# distance_list = sorted(distance_list,key=lambda x: x[1],reverse=False)
+		# print(distance_list)
+
+		"""重心点を主成分分析し，カラーバーに割り当て"""
+		data = [dict_100[i] for i in dict_100.keys()]
+
+		vecs = [doc2vec_vectors[x] for x in doc2vec_vectors.keys()]
+		pca = decomposition.PCA(1)
+		pca.fit(vecs)
+		vecs_pca = pca.transform(data)
+		reg_vecs_pca = (vecs_pca-vecs_pca.min())/(vecs_pca.max()-vecs_pca.min())#0~1に正規化
+		sorted_reg_vecs_pca = sorted(reg_vecs_pca,key=lambda x: x[0],reverse=False)
+
+		result = []
+		for new_rank,new in enumerate(sorted_reg_vecs_pca):
+			for old_rank,old in enumerate(reg_vecs_pca):
+				if new == old:
+					result.append([(new_rank,old_rank),new])
+					print(old_rank)

@@ -32,7 +32,7 @@ col_conv = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 def convert_to_excelpos(row,col):
 	return col_conv[col] + unicode(row+1)
 
-def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_dir=None,G_path=None):
+def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,new_exp_dir,d2v,center_100,tgt_params,pie_dir=None,G_path=None,G_path_new=None):
 	sheet = book.add_worksheet("collection analize")
 
 	draw_topics_flag = False
@@ -56,14 +56,44 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 		# cmap = cm.jet_r
 		cmap = cm.jet
 
-	if "pca_d2v" in tgt_params:
+	if "kmeans100_j" in tgt_params:
+		with open(os.path.join(root_dir,G_path_new)) as fi:
+			G_new = pickle.load(fi)
+		k100_dict = nx.get_node_attributes(G_new,"kmeans_100")
+		k100_old = np.array(k100_dict.values())
+
+		data = [center_100[i] for i in center_100.keys()]
+
 		vecs = [d2v[x] for x in d2v.keys()]
 		pca = decomposition.PCA(1)
 		pca.fit(vecs)
-		vecs_pca = pca.transform(vecs)
+		vecs_pca = pca.transform(data)
 		reg_vecs_pca = (vecs_pca-vecs_pca.min())/(vecs_pca.max()-vecs_pca.min())#0~1に正規化
-		# cmap = cm.jet_r
-		cmap = cm.jet
+		sorted_reg_vecs_pca = sorted(reg_vecs_pca,key=lambda x: x[0],reverse=False)
+
+		result = []
+		for new_rank,new in enumerate(sorted_reg_vecs_pca):
+			for old_rank,old in enumerate(reg_vecs_pca):
+				if new == old:
+					result.append([(new_rank,old_rank),new])
+
+		k100_new = []
+		for label in k100_old:
+			for res in result:
+				if label == res[0][1]:
+					k100_new.append(res[0][0])
+
+		k100_new = np.array(k100_new)
+		k100_new = k100_new.astype("float32")
+		k100_new = (k100_new-k100_new.min())/(k100_new.max()-k100_new.min())
+
+		with open(os.path.join(new_exp_dir,"sort.txt"),'w') as fo:
+			fo.write("(new,old)" + "\n")
+			for res in result:
+				fo.write(str(res[0]) + "\n")
+
+		# c_map = cm.jet_r
+		c_map = cm.jet
 
 	"""1行目（項目名)の追加"""
 	for i,param in enumerate(tgt_params):
@@ -125,12 +155,10 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_
 				c_format = book.add_format()
 				#c_format.set_pattern(1)
 				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
-			elif param == "pca_d2v":
-				val = float(reg_vecs_pca[i])
+			elif param == "kmeans100_j":
+				val = float(k100_new[i])
 				c_format = book.add_format()
-				#c_format.set_pattern(1)
 				c_format.set_bg_color(cvtRGBAflt2HTML(cmap(val)))
-
 			else:
 				val = node.get(param)
 
@@ -173,6 +201,21 @@ def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
 			print "G",G_path,"is not exist"
 			exit()
 
+	G_path_new = None
+	if "hits" in tgt_params:
+		nx_dir_new = os.path.join(new_exp_dir,"nx_datas")
+		# G_path_new = os.path.join(nx_dir_new,"G_with_params_cos_sim.gpkl")
+		G_path_new = os.path.join(nx_dir_new,"G_with_params_euclid.gpkl")
+		if not os.path.exists(G_path_new):
+			print "G",G_path_new,"is not exist"
+			exit()
+
+	center_100 = None
+	if "kmeans100_j" in tgt_params:
+		nx_dir_new = os.path.join(new_exp_dir,"nx_datas")
+		with open(os.path.join(nx_dir_new,"kmeans_n10_d100.pkl")) as fi:
+			center_100 = pickle.load(fi)
+
 	save_name = kwargs.get("save_name","collection_datas.xlsx")
 	top_n = kwargs.get("top_n",20)
 
@@ -182,9 +225,10 @@ def main(root_dir,expname,newexpname,tgt_params,G_name=None,**kwargs):
 	with open(os.path.join(new_exp_dir,"doc2vec.pkl")) as fi:
 	   d2v = pickle.load(fi)
 
+
 	book = xlsxwriter.Workbook(os.path.join(new_exp_dir,save_name))
 	"""Webページの情報"""
-	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,d2v,tgt_params,pie_dir=pie_dir,G_path=G_path)
+	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,new_exp_dir,d2v,center_100,tgt_params,pie_dir=pie_dir,G_path=G_path,G_path_new=G_path_new)
 
 """保存名の決定（root_dir）"""
 def suffix_generator_root(search_word,max_page,add_childs,append):
@@ -225,7 +269,7 @@ if __name__=="__main__":
 	size = int(inifile.get('d2v','size'))
 	new_exp_name = "D" + unicode(size) + suffix_generator(target,is_largest)
 
-	save_name = "collection_datas_d2v.xlsx"
+	save_name = "collection_datas_d2v_4.xlsx"
 	top_n = 20
 
 	tgt_params = [
@@ -242,7 +286,7 @@ if __name__=="__main__":
 		"repTopic",#代表トピック
 		"hits",#HITSスコア
 		"pca_lda",#LDAの主成分分析
-		"pca_d2v"#D2Vの主成分分析
+		"kmeans100_j"#100次元でのクラスタリング
 		]
 
 	main(root_dir=root_dir,expname=exp_name,newexpname=new_exp_name,tgt_params=tgt_params,save_name=save_name,top_n=top_n)

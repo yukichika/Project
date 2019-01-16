@@ -521,7 +521,7 @@ def main(args):
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		"lamb":0.75,
+		"lamb":0.5,
 
 		"node_type":"kmeans3_j",
 		"cmap":"jet",

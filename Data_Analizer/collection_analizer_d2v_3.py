@@ -53,8 +53,8 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 		pca.fit(theta)
 		theta_pca = pca.transform(theta)
 		reg_theta_pca = (theta_pca-theta_pca.min())/(theta_pca.max()-theta_pca.min())#0~1に正規化
-		cmap = cm.jet_r
-		# cmap = cm.jet
+		# cmap = cm.jet_r
+		cmap = cm.jet
 
 	if "kmeans100_j" in tgt_params:
 		with open(os.path.join(root_dir,G_path_new)) as fi:
@@ -63,7 +63,8 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 		k100 = np.array(k100_dict.values())
 		k100 = k100.astype("float32")
 		k100 = (k100-k100.min())/(k100.max()-k100.min())
-		c_map = cm.jet_r
+		# c_map = cm.jet_r
+		c_map = cm.jet
 
 	if "kmeans3_j" in tgt_params:
 		with open(os.path.join(root_dir,G_path_new)) as fi:
@@ -72,7 +73,8 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,tgt_params,pie_dir=
 		k3 = np.array(k3_dict.values())
 		k3 = k3.astype("float32")
 		k3 = (k3-k3.min())/(k3.max()-k3.min())
-		c_map = cm.jet_r
+		# c_map = cm.jet_r
+		c_map = cm.jet
 
 	"""1行目（項目名)の追加"""
 	for i,param in enumerate(tgt_params):
