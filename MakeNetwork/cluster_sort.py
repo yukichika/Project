@@ -68,6 +68,9 @@ if __name__ == "__main__":
 	exp_name_new = "D" + str(size) + suffix_generator(target,is_largest)
 	exp_dir_new = os.path.join(root_dir,exp_name_new)
 	nx_dir_new = os.path.join(exp_dir_new,"nx_datas")
+	check_sort = os.path.join(nx_dir_new,"check_sort")
+	if not os.path.exists(check_sort):
+		os.mkdir(check_sort)
 
 	if not os.path.exists(nx_dir_new):
 		print("D2V modify not finished.")
@@ -94,6 +97,12 @@ if __name__ == "__main__":
 		# 		distance_list.append([i,distance])
 		#
 		# distance_list = sorted(distance_list,key=lambda x: x[1],reverse=False)
+		# with open(os.path.join(check_sort,"target_" + str(target) + ".txt"),'w') as fo:
+		# 	fo.write("target cluster number:" + str(target) + "\n")
+		# 	fo.write("(old,new,distance)" + "\n")
+		#
+		# 	for old,new in zip(dict_100.keys(),distance_list):
+		# 		fo.write("(" + str(old) + "," + str(new[0]) + "," + str(new[1]) + ")" + "\n")
 
 		"""全組み合わせ"""
 		# distance_list = []
@@ -111,20 +120,32 @@ if __name__ == "__main__":
 		#
 		# distance_list = sorted(distance_list,key=lambda x: x[1],reverse=False)
 		# print(distance_list)
+		#
+		# with open(os.path.join(check_sort,"origin.txt"),'w') as fo:
+		# 	fo.write("(old,new,distance)" + "\n")
+		#
+		# 	for old,new in zip(dict_100.keys(),distance_list):
+		# 		fo.write("(" + str(old) + "," + str(new[0]) + "," + str(new[1]) + ")" + "\n")
 
 		"""重心点を主成分分析し，カラーバーに割り当て"""
-		data = [dict_100[i] for i in dict_100.keys()]
-
-		vecs = [doc2vec_vectors[x] for x in doc2vec_vectors.keys()]
-		pca = decomposition.PCA(1)
-		pca.fit(vecs)
-		vecs_pca = pca.transform(data)
-		reg_vecs_pca = (vecs_pca-vecs_pca.min())/(vecs_pca.max()-vecs_pca.min())#0~1に正規化
-		sorted_reg_vecs_pca = sorted(reg_vecs_pca,key=lambda x: x[0],reverse=False)
-
-		result = []
-		for new_rank,new in enumerate(sorted_reg_vecs_pca):
-			for old_rank,old in enumerate(reg_vecs_pca):
-				if new == old:
-					result.append([(new_rank,old_rank),new])
-					print(old_rank)
+		# data = [dict_100[i] for i in dict_100.keys()]
+		#
+		# vecs = [doc2vec_vectors[x] for x in doc2vec_vectors.keys()]
+		# pca = decomposition.PCA(1)
+		# pca.fit(vecs)
+		# vecs_pca = pca.transform(data)
+		# reg_vecs_pca = (vecs_pca-vecs_pca.min())/(vecs_pca.max()-vecs_pca.min())#0~1に正規化
+		# sorted_reg_vecs_pca = sorted(reg_vecs_pca,key=lambda x: x[0],reverse=False)
+		#
+		# result = []
+		# for new_rank,new in enumerate(sorted_reg_vecs_pca):
+		# 	for old_rank,old in enumerate(reg_vecs_pca):
+		# 		if new == old:
+		# 			result.append([(new_rank,old_rank),new])
+		#
+		# print(result)
+		# with open(os.path.join(check_sort,"pca1.txt"),'w') as fo:
+		# 	fo.write("(new,old)" + "\n")
+		#
+		# 	for r in result:
+		# 		fo.write("(" + str(r[0][0]) + "," + str(r[0][1]) + ")" + "\n")
