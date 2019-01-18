@@ -243,6 +243,14 @@ def draw_network(G,pos,**kwargs):
 	color_map = None
 	if node_type == "COMP1":#doc2vecのベクトルを主成分分析で圧縮して着色
 		node_collection,color_map = draw_node_with_lch(G,pos,**kwargs)
+	elif node_type == "kmeans3":#3次元でのクラスタリング結果で着色（カラーリスト）
+		color_map = nx.get_node_attributes(G,"color_k3")
+		size_array = size.values()
+		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax,pick_func=pick_func);
+	elif node_type == "kmeans100":#100次元でのクラスタリング結果で着色（カラーリスト）
+		color_map = nx.get_node_attributes(G,"color_k100")
+		size_array = size.values()
+		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax,pick_func=pick_func);
 	elif node_type == "kmeans3_j":#3次元でのクラスタリング結果で着色（jetカラーマップ）
 		k3_dict = nx.get_node_attributes(G,"kmeans_3")
 		k3 = np.array(k3_dict.values())
@@ -271,14 +279,47 @@ def draw_network(G,pos,**kwargs):
 		node_color = color_map.values()
 		size_array = size.values()
 		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=node_color,node_size=size_array,ax=ax,pick_func=pick_func,lamb=lamb)
-	elif node_type == "kmeans3":#3次元でのクラスタリング結果で着色（カラーリスト）
-		color_map = nx.get_node_attributes(G,"color_k3")
+	elif node_type == "kmeans100_j_sort":#100次元でのクラスタリング結果を主成分分析によってソートして着色（jetカラーマップ）
+		k100_dict = nx.get_node_attributes(G,"kmeans_100")
+		k100_old = np.array(k100_dict.values())
+
+		center_path = kwargs.get("nx_dir")
+		with open(os.path.join(center_path,"kmeans_n10_d100.pkl")) as fi:
+			center_100 = pickle.load(fi)
+		data = [center_100[i] for i in center_100.keys()]
+
+		d2v = kwargs.get("d2v")
+		vecs = [d2v[x] for x in d2v.keys()]
+		pca = decomposition.PCA(1)
+		pca.fit(vecs)
+		vecs_pca = pca.transform(data)
+		reg_vecs_pca = (vecs_pca-vecs_pca.min())/(vecs_pca.max()-vecs_pca.min())#0~1に正規化
+		sorted_reg_vecs_pca = sorted(reg_vecs_pca,key=lambda x: x[0],reverse=False)
+
+		result = []
+		for new_rank,new in enumerate(sorted_reg_vecs_pca):
+			for old_rank,old in enumerate(reg_vecs_pca):
+				if new == old:
+					result.append([(new_rank,old_rank),new])
+
+		k100_new = []
+		for label in k100_old:
+			for res in result:
+				if label == res[0][1]:
+					k100_new.append(res[0][0])
+
+		k100_new = np.array(k100_new)
+		k100_new = k100_new.astype("float32")
+		k100_new = (k100_new-k100_new.min())/(k100_new.max()-k100_new.min())
+
+		# c_map = cm.jet_r
+		c_map = cm.jet
+		color_map = {}
+		for serial_no,node_no in enumerate(G.node.keys()):
+			color_map[node_no] = cvtRGBAflt2HTML(c_map([k100_new[serial_no]]))
+		node_color = color_map.values()
 		size_array = size.values()
-		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax,pick_func=pick_func);
-	elif node_type == "kmeans100":#100次元でのクラスタリング結果で着色（カラーリスト）
-		color_map = nx.get_node_attributes(G,"color_k100")
-		size_array = size.values()
-		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=color_map.values(),node_size=size_array,ax=ax,pick_func=pick_func);
+		node_collection = nx.draw_networkx_nodes(G,pos=pos,node_color=node_color,node_size=size_array,ax=ax,pick_func=pick_func,lamb=lamb)
 
 	nx.draw_networkx_edges(G,pos,ax=ax)
 	return node_collection,color_map
@@ -391,6 +432,7 @@ def main(_params):
 	draw_kwargs = {
 			"size":size_dict,
 			"d2v":d2v,
+			"nx_dir":nx_dir,
 			"draw_option":draw_option
 			}
 

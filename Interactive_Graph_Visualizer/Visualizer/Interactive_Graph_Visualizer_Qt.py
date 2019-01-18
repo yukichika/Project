@@ -472,10 +472,10 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"iPhone"
+	params["search_word"] = u"東京オリンピック"
 	params["max_page"] = 400
 	add_childs = True
-	append = False
+	append = True
 	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
 	params["root_dir"] = save_dir + suffix_generator_root(params["search_word"],params["max_page"],add_childs,append)
 
@@ -523,7 +523,7 @@ def main(args):
 
 		"lamb":0.5,
 
-		"node_type":"kmeans3_j",
+		"node_type":"kmeans100_j",
 		"cmap":"jet",
 		"lumine":200,
 		"color_map_by":"vector1",
