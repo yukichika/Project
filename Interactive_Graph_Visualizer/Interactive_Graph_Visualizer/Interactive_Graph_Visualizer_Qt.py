@@ -472,10 +472,10 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"東京オリンピック"
+	params["search_word"] = u"iPhone"
 	params["max_page"] = 400
 	add_childs = True
-	append = True
+	append = False
 	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
 	params["root_dir"] = save_dir + suffix_generator_root(params["search_word"],params["max_page"],add_childs,append)
 
@@ -492,7 +492,7 @@ def main(args):
 
 	params["draw_option"] = {
 		#力学モデル
-		# "weight_type":[],
+		"weight_type":[],
 
 		#力学モデル+LDA
 		# "weight_type":["ATTR","REPUL"],
@@ -503,9 +503,9 @@ def main(args):
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
 		#力学モデル+LDA+HITS(hub_score)
-		"weight_type":["ATTR","REPUL","HITS"],
-		"weight_attr":{"type":"h_score","min":1,"max":3},
-		"size_attr":{"type":"h_score","min":1000,"max":5000},
+		# "weight_type":["ATTR","REPUL","HITS"],
+		# "weight_attr":{"type":"h_score","min":1,"max":3},
+		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
 		#力学モデル+LDA+BHITS(auth_score)
 		# "weight_type":["ATTR","REPUL","BHITS"],

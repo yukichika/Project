@@ -156,7 +156,8 @@ if __name__ == "__main__":
 		K = int(inifile.get('lda','K'))
 		exp_name = "K" + unicode(K) + suffix_generator(target=target,is_largest=is_largest)
 	elif flag == "d2v":
-		comp_func_name = "cos_sim"
+		# comp_func_name = "cos_sim"
+		comp_func_name = "euclid"
 		D = int(inifile.get('d2v','size'))
 		exp_name = "D" + unicode(D) + suffix_generator(target=target,is_largest=is_largest)
 

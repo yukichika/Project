@@ -472,10 +472,10 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"東京オリンピック"
+	params["search_word"] = u"iPhone"
 	params["max_page"] = 400
 	add_childs = True
-	append = True
+	append = False
 	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
 	params["root_dir"] = save_dir + suffix_generator_root(params["search_word"],params["max_page"],add_childs,append)
 
@@ -489,6 +489,7 @@ def main(args):
 	params["size"] = 100
 	params["exp_name_new"] = "D" + unicode(params["size"]) + suffix_generator(params["target"],params["is_largest"])
 	params["comp_func_name_new"] = "euclid"
+	# params["comp_func_name_new"] = "cos_sim"
 
 	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name_new"]),"nx_datas")
 	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name_new"] + ".gpkl"
@@ -496,10 +497,10 @@ def main(args):
 
 	params["draw_option"] = {
 		#力学モデル
-		"weight_type":[],
+		# "weight_type":[],
 
 		#力学モデル+doc2vec
-		# "weight_type":["ATTR","REPUL"],
+		"weight_type":["ATTR","REPUL"],
 
 		#力学モデル+doc2vec+HITS(auth_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
@@ -521,9 +522,9 @@ def main(args):
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		"lamb":0.5,
+		"lamb":0.9,
 
-		"node_type":"kmeans100_j",
+		"node_type":"kmeans100_j_sort",
 		"cmap":"jet",
 		"lumine":200,
 		"color_map_by":"vector1",
