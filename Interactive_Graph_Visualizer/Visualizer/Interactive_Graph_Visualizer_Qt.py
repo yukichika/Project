@@ -472,7 +472,7 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"iPhone"
+	params["search_word"] = u"東京オリンピック"
 	params["max_page"] = 400
 	add_childs = True
 	append = False
@@ -500,7 +500,7 @@ def main(args):
 		# "weight_type":[],
 
 		#力学モデル+doc2vec
-		"weight_type":["ATTR","REPUL"],
+		# "weight_type":["ATTR","REPUL"],
 
 		#力学モデル+doc2vec+HITS(auth_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
@@ -508,9 +508,9 @@ def main(args):
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
 		#力学モデル+doc2vec+HITS(hub_score)
-		# "weight_type":["ATTR","REPUL","HITS"],
-		# "weight_attr":{"type":"h_score","min":1,"max":3},
-		# "size_attr":{"type":"h_score","min":1000,"max":5000},
+		"weight_type":["ATTR","REPUL","HITS"],
+		"weight_attr":{"type":"h_score","min":1,"max":3},
+		"size_attr":{"type":"h_score","min":1000,"max":5000},
 
 		#力学モデル+doc2vec+BHITS(auth_score)
 		# "weight_type":["ATTR","REPUL","BHITS"],
@@ -522,7 +522,7 @@ def main(args):
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		"lamb":0.9,
+		"lamb":0.75,
 
 		"node_type":"kmeans100_j_sort",
 		"cmap":"jet",
