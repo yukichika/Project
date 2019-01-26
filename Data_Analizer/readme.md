@@ -49,6 +49,7 @@ PCAで次元圧縮した空間と元のトピック分布との対応づけ．
 ## How to Use(for Doc2vec)
 ・collection_analizer_d2v.py  
 Doc2vec（1次元）により構築したグラフデータを分析するために，エクセルに出力．  
+collection_analizer_d2v_4.pyのみで十分．  
 
 取得一覧  
 ```
@@ -116,3 +117,24 @@ kmeans3_j:3次元ベクトルを用いたkmeansによるクラスタ数（カラ
 auth_score:オーソリティスコア
 hub_score:ハブスコア
 ```
+
+・collection_analizer_d2v_4.py   
+collection_analizer_d2v_3の改良版．  
+
+取得一覧  
+```
+<collection_analizer>
+id:Doc2vecの通し番号
+name_id:ファイルid
+len(text):文字数
+url:URL
+domain:ドメイン名
+len_parent:親リンク数
+len_childs:子リンク数
+to_int_links:内部リンク数
+to_ext_links:外部リンク数
+repTopic:代表トピック
+pca_lda:LDAトピック分布の第一主成分
+kmeans100_j:100次元ベクトルを用いたkmeansによるクラスタ数（並び替えた後）（カラーマップによる着色）
+auth_score:オーソリティスコア
+hub_score:ハブスコア

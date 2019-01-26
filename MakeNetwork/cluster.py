@@ -82,7 +82,7 @@ if __name__ == "__main__":
 			pca.fit(data_array)
 			data_array_pca = pca.transform(data_array)
 
-			n_clusters = 10
+			n_clusters = 5
 			"""ベクトルの次元数を保持したままクラスタリング"""
 			print("-----ベクトルの次元数を保持したままクラスタリング-----")
 			kmeans = KMeans(n_clusters=n_clusters,random_state=0).fit(data_array)

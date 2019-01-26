@@ -12,13 +12,14 @@ from PyQt4 import Qt
 from PyQt4 import QtCore
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from sklearn import decomposition
 #import matplotlib.pyplot as plt
-#import numpy as np
+import numpy as np
 
 import my_graph_drawer
 
-#sys.path.append("../networkx-master")
-#import networkx as nx
+sys.path.append("../networkx-master")
+import networkx as nx
 
 #ドラッグ初期位置格納用変数の宣言
 def zoom_factory(ax,base_scale = 2.,startX=0,starty=0):
@@ -224,16 +225,34 @@ class VerboseWidget(QtGui.QWidget):
 		self.table.horizontalHeader().setStretchLastSection(True)
 		items_vbox = QtGui.QVBoxLayout(self)
 		items_vbox.addWidget(self.table,1)
+
 		self.bow_textbox=QtGui.QTextEdit(self)
+		self.bow_textbox2=QtGui.QTextEdit(self)
+
 		items_vbox.addWidget(self.bow_textbox,0)
+		items_vbox.addWidget(self.bow_textbox2,1)
 
 		exp_dir=os.path.join(self.params["root_dir"],self.params["exp_name"])
 		src_pkl_name=self.params.get("src_pkl_name")
 		nx_dir=self.params.get("nx_dir")
+		d_dir = os.path.join(self.params["root_dir"],self.params["exp_name_new"])
 		with open(os.path.join(exp_dir,"instance.pkl")) as fi:
 		   self.lda=pickle.load(fi)
 		with open(os.path.join(nx_dir,src_pkl_name),"r") as fi:
 			self.G=pickle.load(fi)
+		with open(os.path.join(nx_dir,"kmeans_n10_d100.pkl")) as fi:
+			self.center_100 = pickle.load(fi)
+		with open(os.path.join(d_dir,"sort.pkl")) as fi:
+			self.sort = pickle.load(fi)
+		with open(os.path.join(self.params["root_dir"],"file_id_list2.list"),'r') as fi:
+			self.node_list = pickle.load(fi)
+
+		self.dict_ = {}
+		for i,v in enumerate(self.node_list):
+			self.dict_[v] = i
+
+		self.k100_dict = nx.get_node_attributes(self.G,"kmeans_100")
+		self.k100_old = np.array(self.k100_dict.values())
 
 	def change_content(self,file_no):
 		src_pages_dir=os.path.join(self.params["root_dir"],"Pages")
@@ -243,21 +262,22 @@ class VerboseWidget(QtGui.QWidget):
 		"""トピックグラフ表示"""
 		file_id_dict_inv = {v:k for k, v in self.lda.file_id_dict.items()}#ファイル名とLDAでの文書番号(逆引き)．
 		lda_no=file_id_dict_inv.get(file_no)
-		if lda_no != None:
-			self.topicGraph.on_draw(self.lda.theta()[lda_no])#トピック分布グラフの表示
+		# if lda_no != None:
+		# 	self.topicGraph.on_draw(self.lda.theta()[lda_no])#トピック分布グラフの表示
 
 		tgt_params=[
-			["id","LDA_no"],
+			# ["id","d2v_no"],
 			["name_id","file_no"],
 			["title",u"タイトル"],
 			#"len(text)",
 			["url",u"url"],
 			["domain",u"ドメイン"],
-			["len_parents",u"リンクされている数"],
-			["len_childs",u"リンクしている数"],
+			["len_parents",u"入次数"],
+			["len_childs",u"出次数"],
+			["kmeans_100",u"クラスタ番号"]
 			#"repTopic",
-			["auth_score",u"オーソリティスコア"],
-			["hub_score",u"ハブスコア"]
+			# ["auth_score",u"オーソリティスコア"],
+			# ["hub_score",u"ハブスコア"]
 			]
 		self.table.setRowCount(len(tgt_params))
 		self.table.setColumnCount(2)
@@ -284,6 +304,10 @@ class VerboseWidget(QtGui.QWidget):
 				val=self.G.node.get(file_no).get("a_score")
 			elif tgt_param=="hub_score":
 				val=self.G.node.get(file_no).get("h_score")
+			elif tgt_param=="kmeans_100":
+				for re in self.sort:
+					if self.k100_old[self.dict_[file_no]] == re[0][1]:
+						val = re[0][0]
 			else:
 				val=page_info.get(tgt_param)
 			if type(val) is not unicode:
@@ -297,6 +321,12 @@ class VerboseWidget(QtGui.QWidget):
 
 		self.bow_textbox.clear()
 		self.bow_textbox.append(denote_words_freq(bow,topn=15,delimiter="\n"))
+		cursor = self.bow_textbox.textCursor()
+		cursor.movePosition(QtGui.QTextCursor.Start)
+
+		text = page_info.get("myexttext")
+		self.bow_textbox2.clear()
+		self.bow_textbox2.append(text)
 
 class TopicGraph():
 	def __init__(self,*args,**kwargs):
@@ -438,9 +468,9 @@ class AppForm(QtGui.QMainWindow):
 		right_dock1.setWidget(self.verboseWidget)
 		self.addDockWidget(Qt.Qt.RightDockWidgetArea, right_dock1)
 
-		right_dock2 = QtGui.QDockWidget('Topics',self)
-		right_dock2.setWidget(self.topicGraph.canvas)
-		self.addDockWidget(Qt.Qt.RightDockWidgetArea, right_dock2)
+		# right_dock2 = QtGui.QDockWidget('Topics',self)
+		# right_dock2.setWidget(self.topicGraph.canvas)
+		# self.addDockWidget(Qt.Qt.RightDockWidgetArea, right_dock2)
 
 		left_dock = QtGui.QDockWidget('Settings',self)
 		left_dock.setWidget(self.settingWidget)
@@ -472,7 +502,7 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"東京オリンピック"
+	params["search_word"] = u"iPhone"
 	params["max_page"] = 400
 	add_childs = True
 	append = False
@@ -482,47 +512,52 @@ def main(args):
 	params["is_largest"] = True
 	params["target"] = "myexttext"
 
-	params["K"] = 5
+	params["K"] = 10
 	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
 	params["comp_func_name"] = "comp4_2"
 
-	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name"]),"nx_datas")
-	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name"] + ".gpkl"
-	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name"] + ".gpkl"
+	params["size"] = 100
+	params["exp_name_new"] = "D" + unicode(params["size"]) + suffix_generator(params["target"],params["is_largest"])
+	params["comp_func_name_new"] = "euclid"
+	# params["comp_func_name_new"] = "cos_sim"
+
+	params["nx_dir"] = os.path.join(os.path.join(params["root_dir"],params["exp_name_new"]),"nx_datas")
+	params["src_pkl_name"] = "G_with_params_" + params["comp_func_name_new"] + ".gpkl"
+	params["weights_pkl_name"] = "all_node_weights_" + params["comp_func_name_new"] + ".gpkl"
 
 	params["draw_option"] = {
 		#力学モデル
-		"weight_type":[],
+		# "weight_type":[],
 
-		#力学モデル+LDA
-		# "weight_type":["ATTR","REPUL"],
+		#力学モデル+doc2vec
+		"weight_type":["ATTR","REPUL"],
 
-		#力学モデル+LDA+HITS(auth_score)
+		#力学モデル+doc2vec+HITS(auth_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
-		#力学モデル+LDA+HITS(hub_score)
+		#力学モデル+doc2vec+HITS(hub_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		#力学モデル+LDA+BHITS(auth_score)
+		#力学モデル+doc2vec+BHITS(auth_score)
 		# "weight_type":["ATTR","REPUL","BHITS"],
 		# "weight_attr":{"type":"a_score","min":1,"max":3},
 		# "size_attr":{"type":"a_score","min":1000,"max":5000},
 
-		#力学モデル+LDA+BHITS(hub_score)
+		#力学モデル+doc2vec+BHITS(hub_score)
 		# "weight_type":["ATTR","REPUL","BHITS"],
 		# "weight_attr":{"type":"h_score","min":1,"max":3},
 		# "size_attr":{"type":"h_score","min":1000,"max":5000},
 
-		"lamb":0.5,
+		"lamb":0.9,
 
-		"node_type":"COMP1",
+		"node_type":"kmeans100_j_sort",
 		"cmap":"jet",
 		"lumine":200,
-		"color_map_by":"theta",
+		"color_map_by":"vector1",
 
 		"pos_rand_path":"nest1.rand",
 		"do_rescale":True,

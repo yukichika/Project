@@ -45,6 +45,7 @@ bhitsを計算するために，リンク先・リンク元のドメインをGに反映.
 LDAでの結果をDoc2vecの結果に置き換えるスクリプト．  
 D2V_for_SS.py(python3)→D2V_modify_for_graph.py(python2)→cluster.py(python2)の順に回す．  
 テキストの特徴量として，Doc2vecのベクトルを利用．  
+その他のプログラムは基本的にチェック用．  
 
 ・Preprocessing.py(python3)  
 Doc2vecでベクトル化するための前処理プログラム．  
@@ -52,10 +53,6 @@ Doc2vecでベクトル化するための前処理プログラム．
 ・D2V_for_SS.py(python3)  
 LDAで解析したWebページのみ，前処理を行い，学習済みモデルを用いてベクトル化．  
 Webページのidがキー，numpy型のベクトルが要素の辞書で保存．  
-
-・check_word.py(python3)  
-webページ集合の語彙数・平均単語数をテキストファイルに保存．  
-D2V_for_SS.pyのときにやっとけばよかった...  
 
 ・D2V_modify_for_graph.py(python2)  
 エッジ間の重みをDoc2vecのベクトルで取得しnetworkxに反映．  
@@ -77,6 +74,11 @@ Webページ間の類似度を算出．
 
 ・check_distance_distribution.py(python2)  
 可視化するWebページ間の類似度の分布（自分自身は除く）を保存．  
+
+・check_word.py(python3)  
+webページ集合の語彙数・平均単語数をテキストファイルに保存．  
+D2V_for_SS.pyのときにやっとけばよかった...  
+
 ```
 ・コサイン類似度  
 ・コサイン類似度(0～1に正規化)  

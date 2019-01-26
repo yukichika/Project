@@ -91,6 +91,8 @@ def	create_file_analize_sheet(book,src_pages_dir,exp_dir,lda,new_exp_dir,d2v,cen
 			fo.write("(new,old)" + "\n")
 			for res in result:
 				fo.write(str(res[0]) + "\n")
+		with open(os.path.join(new_exp_dir,"sort.pkl"),'w') as fo:
+			pickle.dump(result,fo)
 
 		# c_map = cm.jet_r
 		c_map = cm.jet

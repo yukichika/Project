@@ -1,4 +1,4 @@
-# Visualizer
+# test
 
 ## Requirements
 
@@ -19,6 +19,8 @@ scipy 0.19.0
 Interactive_Graph_Visualizer_Qt.pyを使用．  
 PyQt4をベースに実装．（doc2vecの結果を反映）  
 パラメータはmain文で指定．  
+発表時に見せるために，表示させる項目などを変更したもの．  
+グラフ構造の表示はInteractive_Graph_Visualizer/Visualizerと同じ．
 
 基本操作  
 ```

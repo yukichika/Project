@@ -76,53 +76,53 @@ if __name__ == "__main__":
 	data_array = doc2vec_vectors.values()
 
 	"""エルボー法"""
-	# distortions_10 = []
-	# for i  in range(1,11):
-	# 	km = KMeans(n_clusters=i,random_state=0)
-	# 	km.fit(data_array)
-	# 	distortions_10.append(km.inertia_)
-	#
-	# plt.plot(range(1,11),distortions_10,marker='o')
-	# plt.xlabel('Number of clusters')
-	# plt.ylabel('Distortion')
-	# plt.savefig(os.path.join(check_k,"elbow10.png"))
-	# # plt.show()
-	#
-	# distortions_100 = []
-	# for i  in range(1,101):
-	# 	km = KMeans(n_clusters=i,random_state=0)
-	# 	km.fit(data_array)
-	# 	distortions_100.append(km.inertia_)
-	#
-	# plt.plot(range(1,101),distortions_100,marker='o')
-	# plt.xlabel('Number of clusters')
-	# plt.ylabel('Distortion')
-	# plt.savefig(os.path.join(check_k,"elbow100.png"))
-	# # plt.show()
+	distortions_10 = []
+	for i  in range(1,11):
+		km = KMeans(n_clusters=i,random_state=0)
+		km.fit(data_array)
+		distortions_10.append(km.inertia_)
+
+	plt.plot(range(1,11),distortions_10,marker='o')
+	plt.xlabel('Number of clusters')
+	plt.ylabel('Distortion')
+	plt.savefig(os.path.join(check_k,"elbow10.png"))
+	# plt.show()
+
+	distortions_100 = []
+	for i  in range(1,101):
+		km = KMeans(n_clusters=i,random_state=0)
+		km.fit(data_array)
+		distortions_100.append(km.inertia_)
+
+	plt.plot(range(1,101),distortions_100,marker='o')
+	plt.xlabel('Number of clusters')
+	plt.ylabel('Distortion')
+	plt.savefig(os.path.join(check_k,"elbow100.png"))
+	# plt.show()
 
 	"""シルエット分析"""
-	n_clusters = 10
-	km = KMeans(n_clusters=n_clusters,random_state=0)
-	y_km = km.fit_predict(data_array)
-
-	cluster_labels = np.unique(y_km)
-	n_clusters=cluster_labels.shape[0]
-	silhouette_vals = silhouette_samples(data_array,y_km,metric='euclidean')
-	y_ax_lower, y_ax_upper = 0,0
-	yticks = []
-
-	for i,c in enumerate(cluster_labels):
-		c_silhouette_vals = silhouette_vals[y_km==c]
-		c_silhouette_vals.sort()
-		y_ax_upper += len(c_silhouette_vals)
-		color = cm.jet(float(i)/n_clusters)
-		plt.barh(range(y_ax_lower,y_ax_upper),c_silhouette_vals,height=1.0,edgecolor='none',color=color)
-		yticks.append((y_ax_lower+y_ax_upper)/2)
-		y_ax_lower += len(c_silhouette_vals)
-
-	silhouette_avg = np.mean(silhouette_vals)
-	plt.axvline(silhouette_avg,color="red",linestyle="--")
-	plt.yticks(yticks,cluster_labels + 1)
-	plt.ylabel('Cluster')
-	plt.xlabel('silhouette coefficient')
-	plt.show()
+	# n_clusters = 10
+	# km = KMeans(n_clusters=n_clusters,random_state=0)
+	# y_km = km.fit_predict(data_array)
+	#
+	# cluster_labels = np.unique(y_km)
+	# n_clusters=cluster_labels.shape[0]
+	# silhouette_vals = silhouette_samples(data_array,y_km,metric='euclidean')
+	# y_ax_lower, y_ax_upper = 0,0
+	# yticks = []
+	#
+	# for i,c in enumerate(cluster_labels):
+	# 	c_silhouette_vals = silhouette_vals[y_km==c]
+	# 	c_silhouette_vals.sort()
+	# 	y_ax_upper += len(c_silhouette_vals)
+	# 	color = cm.jet(float(i)/n_clusters)
+	# 	plt.barh(range(y_ax_lower,y_ax_upper),c_silhouette_vals,height=1.0,edgecolor='none',color=color)
+	# 	yticks.append((y_ax_lower+y_ax_upper)/2)
+	# 	y_ax_lower += len(c_silhouette_vals)
+	#
+	# silhouette_avg = np.mean(silhouette_vals)
+	# plt.axvline(silhouette_avg,color="red",linestyle="--")
+	# plt.yticks(yticks,cluster_labels + 1)
+	# plt.ylabel('Cluster')
+	# plt.xlabel('silhouette coefficient')
+	# plt.show()
