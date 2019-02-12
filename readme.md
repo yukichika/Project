@@ -1,14 +1,12 @@
 # Project
 
 ## How to Use
-Crawler(python3)  
+・Crawler(python3)  
 
-MakeNetwork(python2&python3)  
+・MakeNetwork(python2&python3)  
 
-Data_Analizer(python2)  
+・Data_Analizer(python2)  
 
-Interactive_Graph_Visualizer(python2)  
+・Interactive_Graph_Visualizer(python2)  
 
-MyPythonModule(python2)  
-
-Notebook(jupyter notebook)  
+・MyPythonModule(python2)  
