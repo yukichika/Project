@@ -120,8 +120,3 @@ def cv_colormap():
 	img=cv2.applyColorMap(img,cv2.COLORMAP_JET)
 	cv2.imshow("aaa",img)
 	cv2.waitKey()
-
-if __name__=="__main__":
-	#main()
-	test_lch()
-	#cv_colormap()

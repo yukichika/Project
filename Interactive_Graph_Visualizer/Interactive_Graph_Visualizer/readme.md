@@ -31,6 +31,9 @@ ex."weight_attr":{"type":"a_score","min":1,"max":3}
 size_attr:ノードの大きさにHITSを使うか否か（使うならdictでオーソリティかハブか指定）  
 ex."size_attr":{"type":"a_score","min":1000,"max":5000}  
 
+node_type:ノードの着色方法  
+（"REPR":代表トピックで着色，"REPR2":色相をPCAの1次元で，彩度をそれぞれの最大トピックの値で返す，"COMP1":色相をPCAの1次元で，彩度をそれぞれのトピック分布の各比率で合成(composition)，"PIE":円グラフでノード表現）  
+
 cmap:色の対応付け方法("jet" or "lch")  
 lumine:lchを用いる場合の輝度  
 color_map_by:主成分分析の対象（"phi":単語分布，"theta":トピック分布，"None":無色）  

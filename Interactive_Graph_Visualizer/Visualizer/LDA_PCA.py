@@ -208,17 +208,3 @@ def fiting_test():
 	ax.add_artist(ell) # fitted curve
 
 	plt.show()
-
-
-
-if __name__=="__main__":
-	search_word="iPhone"
-	max_page=400
-	#root_dir=ur"C:/Users/fukunaga/Desktop/collect_urls/search_"+search_word+unicode(max_page)
-	root_dir=ur"C:/Users/fukunaga/Desktop/collect_urls/search_"+search_word+"_"+unicode(max_page)+"_add_childs"
-	K=10
-	is_largest=True#リンクから構築したグラフのうち，最大サイズのモノのみを使う場合True
-	target="myexttext"#対象とするwebページの抽出方法を指定
-	exp_name="k"+unicode(K)+suffix_generator(target,is_largest)
-	main(root_dir,exp_name)
-	#fiting_test()

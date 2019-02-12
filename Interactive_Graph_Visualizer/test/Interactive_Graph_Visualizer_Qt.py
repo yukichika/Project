@@ -506,7 +506,7 @@ def main(args):
 	params["max_page"] = 400
 	add_childs = True
 	append = False
-	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
+	save_dir = XXXXXXXXXX
 	params["root_dir"] = save_dir + suffix_generator_root(params["search_word"],params["max_page"],add_childs,append)
 
 	params["is_largest"] = True
