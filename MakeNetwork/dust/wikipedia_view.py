@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
 	target1 = "country"
 	target2 = "alcohol_"
-	INPUT = u"/home/yukichika/ドキュメント/Doc2vec_vector"
+	INPUT = XXXXXXXXXX
 	with open(os.path.join(INPUT,"Wikipedia809710_to_Wiki(202445).pkl"),'rb') as fi:
 		doc2vec_vectors = pickle.load(fi)
 
