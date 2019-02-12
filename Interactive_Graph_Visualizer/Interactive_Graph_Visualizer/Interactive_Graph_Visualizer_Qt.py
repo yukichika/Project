@@ -472,17 +472,17 @@ def suffix_generator(target=None,is_largest=False):
 
 def main(args):
 	params = {}
-	params["search_word"] = u"東京オリンピック"
+	params["search_word"] = u"iPhone"
 	params["max_page"] = 400
 	add_childs = True
 	append = False
-	save_dir = ur"/home/yukichika/ドキュメント/Data/Search"
+	save_dir = XXXXXXXXXX
 	params["root_dir"] = save_dir + suffix_generator_root(params["search_word"],params["max_page"],add_childs,append)
 
 	params["is_largest"] = True
 	params["target"] = "myexttext"
 
-	params["K"] = 5
+	params["K"] = 10
 	params["exp_name"] = "K" + unicode(params["K"]) + suffix_generator(params["target"],params["is_largest"])
 	params["comp_func_name"] = "comp4_2"
 
@@ -492,10 +492,10 @@ def main(args):
 
 	params["draw_option"] = {
 		#力学モデル
-		"weight_type":[],
+		# "weight_type":[],
 
 		#力学モデル+LDA
-		# "weight_type":["ATTR","REPUL"],
+		"weight_type":["ATTR","REPUL"],
 
 		#力学モデル+LDA+HITS(auth_score)
 		# "weight_type":["ATTR","REPUL","HITS"],
